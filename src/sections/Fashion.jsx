@@ -14,7 +14,7 @@ export default function Fashion() {
         {/* Card 1 */}
         <div className="traditional-card p-4">
            {/* 2. Use the variable name inside curly braces */}
-           <img src={tangailSaree} className="w-full h-64 object-cover mb-4" alt="Tangail Jamdani" />
+           <img src={tangailSaree} className="w-full h-64 object-cover mb-4 grayscale hover:grayscale-0 transition duration-500" alt="Tangail Jamdani" />
            <h3 className="serif text-xl">Tangail Jamdani</h3>
            <p className="text-xs text-stone-500 uppercase tracking-widest">GI Certified Wear</p>
         </div>
