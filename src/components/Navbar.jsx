@@ -16,7 +16,7 @@ export default function Navbar() {
         <a href="/" className="brand-color" onClick={toggleMenu}>Home</a>
         <a href="/fashion" onClick={toggleMenu}>Fashion</a>
         <a href="/food" onClick={toggleMenu}>GI Food</a>
-        <a href="/craft" onClick={toggleMenu}>Crafts</a>
+        <a href="/crafts" onClick={toggleMenu}>Crafts</a>
         <a href="/about" onClick={toggleMenu}>Our Story</a>
         <hr className="border-stone-200" />
         <a href="/login" className="text-sm uppercase tracking-widest font-bold">Login / Account</a>
@@ -33,7 +33,7 @@ export default function Navbar() {
           <a href="/" className="brand-color">Home</a>
           <a href="/fashion" className="hover:brand-color transition">Fashion</a>
           <a href="/food" className="hover:brand-color transition">GI Food</a>
-          <a href="/craft" className="hover:brand-color transition">Crafts</a>
+          <a href="/crafts" className="hover:brand-color transition">Crafts</a>
           <a href="/about" className="hover:brand-color transition">Our Story</a>
         </div>
 
