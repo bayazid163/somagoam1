@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 // Import images (Ensure these are in src/assets)
 import shataranji from '../assets/shataranji.png';
@@ -29,7 +30,7 @@ export default function Crafts() {
     <div className="bg-[#F9F7F2]">
       {/* Header */}
       <header className="px-10 py-20 text-center">
-        <span className="brand-color text-xs uppercase tracking-[0.4em] mb-4 block">Handmade in Bangladesh</span>
+        <span className="brand-color text-xs uppercase tracking-[0.4em] mb-4 block font-bold">Handmade in Bangladesh</span>
         <h1 className="text-5xl md:text-7xl serif mb-6">Artisanal <span className="italic font-light">Crafts</span></h1>
         <p className="max-w-2xl mx-auto text-stone-500 text-sm leading-relaxed italic">
           "Preserving the soul of rural artistry through authentic, Geographical Indication (GI) certified handiwork."
@@ -39,28 +40,53 @@ export default function Crafts() {
       {/* Main Grid */}
       <main className="px-10 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {crafts.map((item, index) => (
-            <div key={index} className="bg-white border border-stone-100 hover:border-[#A33B26] transition-all duration-500 transform hover:-translate-y-2 flex flex-col group">
-              <div className="relative h-72 overflow-hidden">
-                <img src={item.img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={item.name} />
-                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest uppercase">{item.region}</div>
-              </div>
-              <div className="p-8 flex-grow flex flex-col">
-                <div className="flex justify-between items-center mb-4">
-                  <span className={`text-[8px] font-extrabold px-2 py-1 rounded uppercase tracking-wider ${item.status === 'GI Status' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                    {item.status}
-                  </span>
-                  <span className="brand-color font-bold italic serif text-[11px]">{item.type}</span>
+          {crafts.map((item, index) => {
+            // Create a URL-friendly slug from the name
+            const productSlug = item.name.toLowerCase().replace(/\s+/g, '-');
+
+            return (
+              <div key={index} className="bg-white border border-stone-100 hover:border-[#A33B26] transition-all duration-500 transform hover:-translate-y-2 flex flex-col group">
+                
+                {/* Clickable Image Section */}
+                <Link to={`/product/${productSlug}`} className="relative h-72 overflow-hidden block">
+                  <img 
+                    src={item.img} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    alt={item.name} 
+                  />
+                  <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
+                    {item.region}
+                  </div>
+                </Link>
+
+                <div className="p-8 flex-grow flex flex-col">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className={`text-[8px] font-extrabold px-2 py-1 rounded uppercase tracking-wider ${item.status === 'GI Status' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                      {item.status}
+                    </span>
+                    <span className="brand-color font-bold italic serif text-[11px]">{item.type}</span>
+                  </div>
+                  
+                  {/* Clickable Title */}
+                  <Link to={`/product/${productSlug}`}>
+                    <h3 className="text-2xl serif mb-3 hover:text-[#A33B26] transition-colors">{item.name}</h3>
+                  </Link>
+                  
+                  <p className="text-stone-500 text-xs leading-relaxed flex-grow">{item.desc}</p>
+                  
+                  <div className="pt-6 border-t border-stone-100 flex justify-between items-center mt-4">
+                    <span className="text-lg font-light">{item.price}</span>
+                    <Link 
+                      to={`/product/${productSlug}`} 
+                      className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline"
+                    >
+                      View Craft
+                    </Link>
+                  </div>
                 </div>
-                <h3 className="text-2xl serif mb-3">{item.name}</h3>
-                <p className="text-stone-500 text-xs leading-relaxed flex-grow">{item.desc}</p>
-                <div className="pt-6 border-t border-stone-100 flex justify-between items-center">
-                  <span className="text-lg font-light">{item.price}</span>
-                  <button className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline">View</button>
-                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
 

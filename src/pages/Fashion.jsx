@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
 // 1. Import your images (Ensure these exist in src/assets)
 import dhakaJamdani from '../assets/dhaka_jamdani.jpg';
 import tangailSaree from '../assets/tangail_sareee.jpg';
@@ -25,7 +27,7 @@ export default function Fashion() {
     <div className="bg-[#F9F7F2]">
       {/* Header */}
       <header className="px-10 py-16 text-center border-b border-stone-200">
-        <span className="brand-color text-xs uppercase tracking-[0.4em] mb-4 block">Threads of History</span>
+        <span className="brand-color text-xs uppercase tracking-[0.4em] mb-4 block font-bold">Threads of History</span>
         <h1 className="text-5xl md:text-7xl serif mb-6">Heritage <span className="italic font-light">Fashion</span></h1>
         <p className="max-w-2xl mx-auto text-stone-500 text-sm leading-relaxed italic">
           "Certified authentic weaves directly from the looms of master artisans."
@@ -35,30 +37,53 @@ export default function Fashion() {
       {/* Product Grid */}
       <main className="px-10 py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((item, index) => (
-            <div key={index} className="product-card flex flex-col bg-white border border-stone-100 hover:border-[#A33B26] transition-all duration-300">
-              <div className="relative h-80 overflow-hidden">
-                <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
-                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
-                  {item.region}
+          {products.map((item, index) => {
+            // Generate the URL slug
+            const productSlug = item.name.toLowerCase().replace(/\s+/g, '-');
+
+            return (
+              <div key={index} className="product-card flex flex-col bg-white border border-stone-100 hover:border-[#A33B26] transition-all duration-300 group">
+                
+                {/* Clickable Image Area */}
+                <Link to={`/product/${productSlug}`} className="relative h-80 overflow-hidden block">
+                  <img 
+                    src={item.img} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  />
+                  <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
+                    {item.region}
+                  </div>
+                </Link>
+
+                <div className="p-6 flex-grow flex flex-col">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className={`text-[8px] font-extrabold px-2 py-1 rounded uppercase tracking-wider ${item.cert === 'GI Certified' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                      {item.cert}
+                    </span>
+                    <span className="brand-color font-bold italic serif text-[10px]">{item.type}</span>
+                  </div>
+                  
+                  {/* Clickable Title */}
+                  <Link to={`/product/${productSlug}`}>
+                    <h3 className="serif text-xl mb-1 hover:text-[#A33B26] transition-colors">{item.name}</h3>
+                  </Link>
+                  
+                  <p className="text-stone-500 text-xs flex-grow">{item.desc}</p>
+                  
+                  <div className="pt-4 mt-4 border-t border-stone-100 flex justify-between items-center">
+                    <span className="font-bold">{item.price}</span>
+                    <Link 
+                      to={`/product/${productSlug}`} 
+                      className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline"
+                    >
+                      Details
+                    </Link>
+                  </div>
                 </div>
               </div>
-              <div className="p-6 flex-grow flex flex-col">
-                <div className="flex justify-between items-center mb-3">
-                  <span className={`text-[8px] font-extrabold px-2 py-1 rounded uppercase tracking-wider ${item.cert === 'GI Certified' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                    {item.cert}
-                  </span>
-                  <span className="brand-color font-bold italic serif text-[10px]">{item.type}</span>
-                </div>
-                <h3 className="serif text-xl mb-1">{item.name}</h3>
-                <p className="text-stone-500 text-xs flex-grow">{item.desc}</p>
-                <div className="pt-4 mt-4 border-t border-stone-100 flex justify-between items-center">
-                  <span className="font-bold">{item.price}</span>
-                  <button className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline">Details</button>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
 
