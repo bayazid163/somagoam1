@@ -9,6 +9,7 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProductDetail from "./pages/ProductDetail";
+import Checkout from './pages/Checkout';
 
 function App() {
   const location = useLocation();
@@ -29,9 +30,10 @@ function App() {
           <Route path="/food" element={<Food />} />
           <Route path="/crafts" element={<Crafts />} />
           <Route path="/about" element={<About />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
         </Routes>
       </div>
 
