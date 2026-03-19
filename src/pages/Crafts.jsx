@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 // Import images (Ensure these are in src/assets)
 import shataranji from '../assets/shataranji.png';
@@ -14,6 +15,7 @@ import jewelry from '../assets/trival_jewallary.jpg';
 import craftStory from '../assets/craft_story.jpg';
 
 export default function Crafts() {
+  const { addToCart } = useCart();
   const crafts = [
     { name: "Jessore Shotoronji", region: "Jessore", img: shataranji, status: "GI Status", type: "Textile Craft", price: "৳ 3,500 – 35,000", desc: "Traditional hand-woven floor mats featuring rhythmic patterns and organic dyes." },
     { name: "Nakshi Kantha", region: "Mymensingh", img: nakshiKatha, status: "GI Status", type: "Textile Craft", price: "৳ 3,000 – 50,000+", desc: "Hand-embroidered quilts telling stories of rural life through every stitch." },
@@ -83,6 +85,21 @@ export default function Crafts() {
                       View Craft
                     </Link>
                   </div>
+                  {/* Action Buttons Area */}
+                    <div className="flex items-center gap-4">
+                      <button 
+                        onClick={() => addToCart({ ...item, price: item.price })}
+                        className="brand-bg text-white px-4 py-2 text-[10px] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity"
+                      >
+                        Add to Bag
+                      </button>
+                      <Link 
+                        to={`/product/${productSlug}`} 
+                        className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline"
+                      >
+                        View Craft
+                      </Link>
+                    </div>
                 </div>
               </div>
             );
