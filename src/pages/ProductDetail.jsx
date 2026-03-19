@@ -38,7 +38,7 @@ export default function ProductDetail() {
         <div className="lg:col-span-7 space-y-4">
           <div className="aspect-[4/5] bg-stone-200 overflow-hidden rounded-sm">
             <img 
-              src={`https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80`} 
+              src={`https://images.unsplash.com/photo-1615886753866-79396abc446e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`} 
               alt={product.name}
               className="w-full h-full object-cover"
             />
