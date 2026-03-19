@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
-// 1. Import your images (Ensure these exist in src/assets)
+// Import images
 import dhakaJamdani from '../assets/dhaka_jamdani.jpg';
 import tangailSaree from '../assets/tangail_sareee.jpg';
 import rajshahiSilk from '../assets/rajshahi_silk_saree.png';
@@ -12,15 +13,17 @@ import chakmaDress from '../assets/Chakma_dress.jpeg';
 import sareeStory from '../assets/saree_story.jpg';
 
 export default function Fashion() {
-  // 2. Data array for products
+  const { addToCart } = useCart();
+
+  // Data array updated with basePrice for the checkout calculations
   const products = [
-    { name: "Dhakai Jamdani", region: "Dhaka", img: dhakaJamdani, type: "Saree", cert: "GI Certified", price: "৳ 10k - 1.5L+", desc: "Exquisite hand-loomed muslin with intricate motifs." },
-    { name: "Tangail Tant Saree", region: "Tangail", img: tangailSaree, type: "Saree", cert: "GI Certified", price: "৳ 2.5k - 25k", desc: "Traditional cotton weaves known for refined borders." },
-    { name: "Rajshahi Silk Saree", region: "Rajshahi", img: rajshahiSilk, type: "Saree", cert: "GI Certified", price: "৳ 15k - 60k", desc: "Pure Mulberry silk, famous for luxurious texture." },
-    { name: "Khadi Garments", region: "Cumilla", img: khadiPanjabi, type: "Wearable", cert: "Local Heritage", price: "৳ 1,200 - 8k", desc: "Hand-spun, hand-woven fabric that breathes." },
-    { name: "Monipuri Dress", region: "Sylhet", img: monipuri, type: "Wearable", cert: "Local Heritage", price: "৳ 2,500 - 18k", desc: "Distinctive geometric patterns from the community." },
-    { name: "Handloom Cotton", region: "Pabna", img: halfSilk, type: "Saree", cert: "Local Heritage", price: "৳ 2,000 - 15k", desc: "Soft daily wear sarees from weaver colonies." },
-    { name: "Ethnic Wear", region: "Hill Tracts", img: chakmaDress, type: "Wearable", cert: "Local Heritage", price: "৳ 1,500 - 20k", desc: "Back-strap loom fabrics reflecting tribal culture." },
+    { name: "Dhakai Jamdani", region: "Dhaka", img: dhakaJamdani, type: "Saree", cert: "GI Certified", price: "৳ 10,000", basePrice: 10000, shelfLife: "stable", desc: "Exquisite hand-loomed muslin with intricate motifs." },
+    { name: "Tangail Tant Saree", region: "Tangail", img: tangailSaree, type: "Saree", cert: "GI Certified", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Traditional cotton weaves known for refined borders." },
+    { name: "Rajshahi Silk Saree", region: "Rajshahi", img: rajshahiSilk, type: "Saree", cert: "GI Certified", price: "৳ 15,000", basePrice: 15000, shelfLife: "stable", desc: "Pure Mulberry silk, famous for luxurious texture." },
+    { name: "Khadi Garments", region: "Cumilla", img: khadiPanjabi, type: "Wearable", cert: "Local Heritage", price: "৳ 1,200", basePrice: 1200, shelfLife: "stable", desc: "Hand-spun, hand-woven fabric that breathes." },
+    { name: "Monipuri Dress", region: "Sylhet", img: monipuri, type: "Wearable", cert: "Local Heritage", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Distinctive geometric patterns from the community." },
+    { name: "Handloom Cotton", region: "Pabna", img: halfSilk, type: "Saree", cert: "Local Heritage", price: "৳ 2,000", basePrice: 2000, shelfLife: "stable", desc: "Soft daily wear sarees from weaver colonies." },
+    { name: "Ethnic Wear", region: "Hill Tracts", img: chakmaDress, type: "Wearable", cert: "Local Heritage", price: "৳ 1,500", basePrice: 1500, shelfLife: "stable", desc: "Back-strap loom fabrics reflecting tribal culture." },
   ];
 
   return (
@@ -38,7 +41,6 @@ export default function Fashion() {
       <main className="px-10 py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {products.map((item, index) => {
-            // Generate the URL slug
             const productSlug = item.name.toLowerCase().replace(/\s+/g, '-');
 
             return (
@@ -69,16 +71,26 @@ export default function Fashion() {
                     <h3 className="serif text-xl mb-1 hover:text-[#A33B26] transition-colors">{item.name}</h3>
                   </Link>
                   
-                  <p className="text-stone-500 text-xs flex-grow">{item.desc}</p>
+                  <p className="text-stone-500 text-xs flex-grow mb-4">{item.desc}</p>
                   
-                  <div className="pt-4 mt-4 border-t border-stone-100 flex justify-between items-center">
-                    <span className="font-bold">{item.price}</span>
-                    <Link 
-                      to={`/product/${productSlug}`} 
-                      className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline"
-                    >
-                      Details
-                    </Link>
+                  <div className="pt-4 mt-auto border-t border-stone-100 flex justify-between items-center">
+                    <span className="font-bold text-sm">{item.price}</span>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => addToCart({ ...item, price: item.basePrice })}
+                        className="brand-bg text-white px-3 py-2 text-[9px] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity"
+                      >
+                        Add to Bag
+                      </button>
+                      <Link 
+                        to={`/product/${productSlug}`} 
+                        className="brand-color text-[9px] font-bold uppercase tracking-widest hover:underline"
+                      >
+                        Details
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>

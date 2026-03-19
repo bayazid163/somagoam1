@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext'; // 1. Import the hook
 
-// Import images (Ensure these paths match your src/assets folder)
+// Import images
 import roshmalai from '../assets/cumilla_roshmalai.png';
 import bograrDahi from '../assets/Bograr_dahi.jpg';
 import chomchom from '../assets/tangail_chomchom.jpg';
@@ -19,16 +20,18 @@ import shutki from '../assets/shutki.png';
 import mustardOil from '../assets/mustard-oil.jpg';
 
 export default function Food() {
+  const { addToCart } = useCart(); // 2. Initialize the cart function
+
   const sections = [
     {
       title: "Short Shelf-Life",
       subtitle: "(3–5 Days)",
       warning: "Requires Refrigerated Storage & Quick Delivery",
       items: [
-        { name: "Traditional Roshmalai", region: "Cumilla", img: roshmalai, badge: "LAB VERIFIED", price: "650", unit: "/ kg", desc: "Ancient 'khira' reduction method. 100% pure cow milk." },
-        { name: "Bogura Mishti Doi", region: "Bogura", img: bograrDahi, badge: "PURITY TESTED", price: "350", unit: "/ Pot", desc: "Fermented in traditional clay pots for unique aroma." },
-        { name: "Porabari Chomchom", region: "Tangail", img: chomchom, badge: "AUTHENTIC", price: "700", unit: "/ kg", desc: "Famous 'King of Sweets' made with Dhaleshwari river water." },
-        { name: "Premium Cow Ghee", region: "Pabna", img: ghee, badge: "100% PURE", price: "1750", unit: "/ kg", desc: "Hand-churned ghee with rich granular texture." },
+        { name: "Traditional Roshmalai", region: "Cumilla", img: roshmalai, badge: "LAB VERIFIED", price: "650", basePrice: 650, shelfLife: "perishable", unit: "/ kg", desc: "Ancient 'khira' reduction method. 100% pure cow milk." },
+        { name: "Bogura Mishti Doi", region: "Bogura", img: bograrDahi, badge: "PURITY TESTED", price: "350", basePrice: 350, shelfLife: "perishable", unit: "/ Pot", desc: "Fermented in traditional clay pots for unique aroma." },
+        { name: "Porabari Chomchom", region: "Tangail", img: chomchom, badge: "AUTHENTIC", price: "700", basePrice: 700, shelfLife: "perishable", unit: "/ kg", desc: "Famous 'King of Sweets' made with Dhaleshwari river water." },
+        { name: "Premium Cow Ghee", region: "Pabna", img: ghee, badge: "100% PURE", price: "1750", basePrice: 1750, shelfLife: "stable", unit: "/ kg", desc: "Hand-churned ghee with rich granular texture." },
       ]
     }, 
     {
@@ -36,10 +39,10 @@ export default function Food() {
       subtitle: "(Within 24 Hours)",
       warning: "Same-Day Delivery Only",
       items: [
-        { name: "Fresh Bhapa Pitha", region: "Sylhet", img: bhapa, badge: "FRESH MADE", price: "50", unit: "", desc: "Steamed rice cakes with liquid jaggery and coconut." },
-        { name: "Patisapta Pitha", region: "Dhaka", img: patishapta, badge: "NO PRESERVATIVES", price: "150", unit: "", desc: "Thin rice-flour crepes with luscious Kheer filling." },
-        { name: "Traditional Payesh", region: "Munshiganj", img: payesh, badge: "PURE MILK", price: "200", unit: "", desc: "Slow-cooked rice pudding using Gobindobhog rice." },
-        { name: "Chitoi Pitha", region: "Chattogram", img: chitoi, badge: "AUTHENTIC", price: "100", unit: "", desc: "Fluffy steamed cakes served with spicy bhortas." },
+        { name: "Fresh Bhapa Pitha", region: "Sylhet", img: bhapa, badge: "FRESH MADE", price: "50", basePrice: 50, shelfLife: "ultra-perishable", unit: "", desc: "Steamed rice cakes with liquid jaggery and coconut." },
+        { name: "Patisapta Pitha", region: "Dhaka", img: patishapta, badge: "NO PRESERVATIVES", price: "150", basePrice: 150, shelfLife: "ultra-perishable", unit: "", desc: "Thin rice-flour crepes with luscious Kheer filling." },
+        { name: "Traditional Payesh", region: "Munshiganj", img: payesh, badge: "PURE MILK", price: "200", basePrice: 200, shelfLife: "ultra-perishable", unit: "", desc: "Slow-cooked rice pudding using Gobindobhog rice." },
+        { name: "Chitoi Pitha", region: "Chattogram", img: chitoi, badge: "AUTHENTIC", price: "100", basePrice: 100, shelfLife: "ultra-perishable", unit: "", desc: "Fluffy steamed cakes served with spicy bhortas." },
       ]
     }, 
     {
@@ -47,9 +50,9 @@ export default function Food() {
         subtitle: "(GI Fruits & Fish)",
         warning: "Cold-Chain Required",
         items: [
-          { name: "Padma Ilish", region: "Padma River", img: ilish, badge: "GI CERTIFIED", price: "1200", unit: "/ kg", desc: "The iconic Hilsa fish with unique flavor from Padma." },
-          { name: "Himsagar Pitha", region: "Rajshahi", img: himsagar, badge: "TRADITIONAL RECIPE", price: "80", unit: "", desc: "Dense, sweet pitha soaked in thickened milk." },
-          { name: "Sylhet Shatkora Pickle", region: "Sylhet", img: shatkora, badge: "HANDMADE", price: "250", unit: "/ jar", desc: "Tangy citrus pickle made with local shatkora fruit." }
+          { name: "Padma Ilish", region: "Padma River", img: ilish, badge: "GI CERTIFIED", price: "1200", basePrice: 1200, shelfLife: "perishable", unit: "/ kg", desc: "The iconic Hilsa fish with unique flavor from Padma." },
+          { name: "Himsagar Pitha", region: "Rajshahi", img: himsagar, badge: "TRADITIONAL RECIPE", price: "80", basePrice: 80, shelfLife: "perishable", unit: "", desc: "Dense, sweet pitha soaked in thickened milk." },
+          { name: "Sylhet Shatkora Pickle", region: "Sylhet", img: shatkora, badge: "HANDMADE", price: "250", basePrice: 250, shelfLife: "stable", unit: "/ jar", desc: "Tangy citrus pickle made with local shatkora fruit." }
         ]
     }, 
     {
@@ -57,10 +60,10 @@ export default function Food() {
         subtitle: "(7–30 Days)",
         warning: "Suitable for International Shipping",
         items: [
-            { name: "Khejur Gur", region: "Khulna", img: gur, badge: "100% NATURAL", price: "300", unit: "/ kg", desc: "Unrefined jaggery made from date palm sap." },
-            { name: "Mixed Achar", region: "Chattogram", img: achar, badge: "GI CERTIFIED", price: "150", unit: "/ jar", desc: "Spicy mixed vegetable pickle with traditional spices." },
-            { name: "Shutki", region: "Chattogram", img: shutki, badge: "AUTHENTIC", price: "500", unit: "/ kg", desc: "Sun-dried fish with intense flavor, a regional delicacy." },
-            { name: "Mustard Oil", region: "Rangpur", img: mustardOil, badge: "GI CERTIFIED", price: "400", unit: "/ liter", desc: "Cold-pressed mustard oil with strong aroma and flavor." },
+            { name: "Khejur Gur", region: "Khulna", img: gur, badge: "100% NATURAL", price: "300", basePrice: 300, shelfLife: "stable", unit: "/ kg", desc: "Unrefined jaggery made from date palm sap." },
+            { name: "Mixed Achar", region: "Chattogram", img: achar, badge: "GI CERTIFIED", price: "150", basePrice: 150, shelfLife: "stable", unit: "/ jar", desc: "Spicy mixed vegetable pickle with traditional spices." },
+            { name: "Shutki", region: "Chattogram", img: shutki, badge: "AUTHENTIC", price: "500", basePrice: 500, shelfLife: "stable", unit: "/ kg", desc: "Sun-dried fish with intense flavor, a regional delicacy." },
+            { name: "Mustard Oil", region: "Rangpur", img: mustardOil, badge: "GI CERTIFIED", price: "400", basePrice: 400, shelfLife: "stable", unit: "/ liter", desc: "Cold-pressed mustard oil with strong aroma and flavor." },
         ]
     } 
   ];
@@ -105,21 +108,30 @@ export default function Food() {
                       <span className="brand-color font-bold italic serif text-[10px]">GI Status</span>
                     </div>
 
-                    {/* Clickable Title */}
                     <Link to={`/product/${productSlug}`}>
                       <h3 className="serif text-xl mb-2 hover:text-[#A33B26] transition-colors">{item.name}</h3>
                     </Link>
 
-                    <p className="text-stone-500 text-xs flex-grow">{item.desc}</p>
+                    <p className="text-stone-500 text-xs flex-grow mb-4">{item.desc}</p>
                     
-                    <div className="pt-4 mt-4 border-t border-stone-100 flex justify-between items-center">
+                    <div className="pt-4 mt-auto border-t border-stone-100 flex justify-between items-center">
                       <span className="font-bold font-sans text-sm">৳ {item.price}{item.unit}</span>
-                      <Link 
-                        to={`/product/${productSlug}`} 
-                        className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline"
-                      >
-                        Order
-                      </Link>
+                      
+                      {/* Action Buttons: Order (Add to Bag) and Details */}
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => addToCart({ ...item, price: item.basePrice })}
+                          className="brand-bg text-white px-3 py-2 text-[9px] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity"
+                        >
+                          Order
+                        </button>
+                        <Link 
+                          to={`/product/${productSlug}`} 
+                          className="brand-color text-[9px] font-bold uppercase tracking-widest hover:underline"
+                        >
+                          Details
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>

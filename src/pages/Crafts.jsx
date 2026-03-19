@@ -16,16 +16,18 @@ import craftStory from '../assets/craft_story.jpg';
 
 export default function Crafts() {
   const { addToCart } = useCart();
+
+  // Added 'basePrice' as a Number for mathematical calculations in the Cart/Checkout
   const crafts = [
-    { name: "Jessore Shotoronji", region: "Jessore", img: shataranji, status: "GI Status", type: "Textile Craft", price: "৳ 3,500 – 35,000", desc: "Traditional hand-woven floor mats featuring rhythmic patterns and organic dyes." },
-    { name: "Nakshi Kantha", region: "Mymensingh", img: nakshiKatha, status: "GI Status", type: "Textile Craft", price: "৳ 3,000 – 50,000+", desc: "Hand-embroidered quilts telling stories of rural life through every stitch." },
-    { name: "Shital Pati", region: "Sylhet", img: shitalPati, status: "GI Status", type: "Cane Craft", price: "৳ 2,500 – 20,000", desc: "Cool-feeling mats hand-woven from Murta cane, recognized by UNESCO." },
-    { name: "Heritage Pottery", region: "Dhamrai", img: pottery, status: "Local Heritage", type: "Clay Craft", price: "৳ 300 – 5,000", desc: "Terracotta and glazed clay work crafted using ancient wood-fired kilns." },
-    { name: "Bamboo & Cane", region: "Sylhet", img: bamboo, status: "Local Heritage", type: "Utility Craft", price: "৳ 500 – 25,000", desc: "Sustainable utility items, from baskets to sophisticated home decor." },
-    { name: "Brass & Bell Metal", region: "Dhamrai", img: metal, status: "Local Heritage", type: "Metal Craft", price: "৳ 2,000 – 40,000", desc: "Lost-wax casting method used to create royal tableware and statues." },
-    { name: "Wood Carving", region: "Dinajpur", img: wood, status: "Local Heritage", type: "Wood Craft", price: "৳ 1,500 – 60,000", desc: "Intricate relief carving on seasoned wood for traditional doors." },
-    { name: "Jute Handicrafts", region: "Faridpur", img: jute, status: "Local Heritage", type: "Eco Craft", price: "৳ 300 – 8,000", desc: "Biodegradable fashion bags and home textiles from the 'Golden Fiber'." },
-    { name: "Tribal Handicrafts", region: "Hill Tracts", img: jewelry, status: "Local Heritage", type: "Ethnic Craft", price: "৳ 800 – 20,000", desc: "Traditional jewelry reflecting the diverse ethnic groups of CHT." },
+    { name: "Jessore Shotoronji", region: "Jessore", img: shataranji, status: "GI Status", type: "Textile Craft", price: "৳ 3,500", basePrice: 3500, desc: "Traditional hand-woven floor mats featuring rhythmic patterns and organic dyes." },
+    { name: "Nakshi Kantha", region: "Mymensingh", img: nakshiKatha, status: "GI Status", type: "Textile Craft", price: "৳ 3,000", basePrice: 3000, desc: "Hand-embroidered quilts telling stories of rural life through every stitch." },
+    { name: "Shital Pati", region: "Sylhet", img: shitalPati, status: "GI Status", type: "Cane Craft", price: "৳ 2,500", basePrice: 2500, desc: "Cool-feeling mats hand-woven from Murta cane, recognized by UNESCO." },
+    { name: "Heritage Pottery", region: "Dhamrai", img: pottery, status: "Local Heritage", type: "Clay Craft", price: "৳ 300", basePrice: 300, desc: "Terracotta and glazed clay work crafted using ancient wood-fired kilns." },
+    { name: "Bamboo & Cane", region: "Sylhet", img: bamboo, status: "Local Heritage", type: "Utility Craft", price: "৳ 500", basePrice: 500, desc: "Sustainable utility items, from baskets to sophisticated home decor." },
+    { name: "Brass & Bell Metal", region: "Dhamrai", img: metal, status: "Local Heritage", type: "Metal Craft", price: "৳ 2,000", basePrice: 2000, desc: "Lost-wax casting method used to create royal tableware and statues." },
+    { name: "Wood Carving", region: "Dinajpur", img: wood, status: "Local Heritage", type: "Wood Craft", price: "৳ 1,500", basePrice: 1500, desc: "Intricate relief carving on seasoned wood for traditional doors." },
+    { name: "Jute Handicrafts", region: "Faridpur", img: jute, status: "Local Heritage", type: "Eco Craft", price: "৳ 300", basePrice: 300, desc: "Biodegradable fashion bags and home textiles from the 'Golden Fiber'." },
+    { name: "Tribal Handicrafts", region: "Hill Tracts", img: jewelry, status: "Local Heritage", type: "Ethnic Craft", price: "৳ 800", basePrice: 800, desc: "Traditional jewelry reflecting the diverse ethnic groups of CHT." },
   ];
 
   return (
@@ -43,13 +45,12 @@ export default function Crafts() {
       <main className="px-10 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {crafts.map((item, index) => {
-            // Create a URL-friendly slug from the name
             const productSlug = item.name.toLowerCase().replace(/\s+/g, '-');
 
             return (
               <div key={index} className="bg-white border border-stone-100 hover:border-[#A33B26] transition-all duration-500 transform hover:-translate-y-2 flex flex-col group">
                 
-                {/* Clickable Image Section */}
+                {/* Image Section */}
                 <Link to={`/product/${productSlug}`} className="relative h-72 overflow-hidden block">
                   <img 
                     src={item.img} 
@@ -69,26 +70,19 @@ export default function Crafts() {
                     <span className="brand-color font-bold italic serif text-[11px]">{item.type}</span>
                   </div>
                   
-                  {/* Clickable Title */}
                   <Link to={`/product/${productSlug}`}>
                     <h3 className="text-2xl serif mb-3 hover:text-[#A33B26] transition-colors">{item.name}</h3>
                   </Link>
                   
                   <p className="text-stone-500 text-xs leading-relaxed flex-grow">{item.desc}</p>
                   
+                  {/* Action Section: Price and Buttons in one clean row */}
                   <div className="pt-6 border-t border-stone-100 flex justify-between items-center mt-4">
                     <span className="text-lg font-light">{item.price}</span>
-                    <Link 
-                      to={`/product/${productSlug}`} 
-                      className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline"
-                    >
-                      View Craft
-                    </Link>
-                  </div>
-                  {/* Action Buttons Area */}
-                    <div className="flex items-center gap-4">
+                    
+                    <div className="flex items-center gap-3">
                       <button 
-                        onClick={() => addToCart({ ...item, price: item.price })}
+                        onClick={() => addToCart({ ...item, price: item.basePrice })}
                         className="brand-bg text-white px-4 py-2 text-[10px] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity"
                       >
                         Add to Bag
@@ -97,9 +91,10 @@ export default function Crafts() {
                         to={`/product/${productSlug}`} 
                         className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline"
                       >
-                        View Craft
+                        Details
                       </Link>
                     </div>
+                  </div>
                 </div>
               </div>
             );
