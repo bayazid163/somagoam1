@@ -10,19 +10,27 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from './pages/Checkout';
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel";
 
 function App() {
   const location = useLocation();
 
-  // Define which pages should NOT have the Navbar or Footer
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  // 1. Unified logic for hiding Layout (Navbar/Footer)
+  // Note: Changed '/payment/fail' to '/payment/cancel' to match your PaymentCancel page logic if needed, 
+  // or keep it as /fail but ensure it matches your Route path below.
+  const hideLayout = 
+  location.pathname === '/login' || 
+  location.pathname === '/register' ||
+  location.pathname === '/payment/success' || 
+  location.pathname === '/payment/fail' || 
+  location.pathname === '/payment/cancel';
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hide Navbar on login */}
-      {!isAuthPage && <Navbar />}
+      {/* 2. Uses hideLayout to toggle Navbar */}
+      {!hideLayout && <Navbar />}
       
-      {/* Main content area expands to push footer down */}
       <div className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -34,11 +42,15 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          {/* 3. Ensure path matches your hideLayout check exactly */}
+          <Route path="/payment/fail" element={<PaymentCancel />} />
+          <Route path="/payment/cancel" element={<PaymentCancel />} />
         </Routes>
       </div>
 
-      {/* Hide Footer on login */}
-      {!isAuthPage && <Footer />}
+      {/* 4. FIXED: Changed 'isAuthPage' to 'hideLayout' */}
+      {!hideLayout && <Footer />}
     </div>
   );
 }

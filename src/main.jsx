@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { CartProvider } from './context/CartContext' // 1. Import the Provider
+import { CartProvider } from './context/CartContext.jsx' // 1. Import the Provider
 import './index.css'
 import App from './App.jsx'
 

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ShoppingBag, CreditCard } from 'lucide-react'; // Added icons for the buttons
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
 
-  // In a real app, you would fetch this data from an API based on the ID
+  // Mock product data
   const product = {
     name: "Premium Dhakai Jamdani",
     price: "৳ 25,500",
@@ -21,6 +22,13 @@ export default function ProductDetail() {
     description: "This 200-count cotton Jamdani features the 'Panna Hajar' (thousand emeralds) motif. Hand-loomed over 3 months using the traditional 'Kandari' technique which has remained unchanged since the Mughal era.",
     specs: ["Material: 100% Fine Cotton", "Thread Count: 200", "Motif: Panna Hajar", "Weight: 450g"],
     shipping: "7-10 Days (Global Shipping Available)"
+  };
+
+  // Function to handle the "Buy Now" click
+  const handleBuyNow = () => {
+    // In the future, you can add logic here to pass this specific item 
+    // to your Checkout state or Cart context.
+    navigate('/checkout');
   };
 
   return (
@@ -38,7 +46,7 @@ export default function ProductDetail() {
         <div className="lg:col-span-7 space-y-4">
           <div className="aspect-[4/5] bg-stone-200 overflow-hidden rounded-sm">
             <img 
-              src={`https://images.unsplash.com/photo-1615886753866-79396abc446e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`} 
+              src={`https://images.unsplash.com/photo-1615886753866-79396abc446e?q=80&w=687&auto=format&fit=crop`} 
               alt={product.name}
               className="w-full h-full object-cover"
             />
@@ -69,15 +77,28 @@ export default function ProductDetail() {
               </ul>
             </div>
 
-            {/* Selection & Action */}
-            <div className="flex gap-4 mb-8">
-              <div className="flex items-center border border-stone-300 px-4 py-2">
-                <button onClick={() => setQuantity(q => Math.max(1, q-1))} className="px-2">-</button>
-                <span className="px-4 font-bold">{quantity}</span>
-                <button onClick={() => setQuantity(q => q+1)} className="px-2">+</button>
+            {/* Selection & Action Area */}
+            <div className="space-y-4 mb-8">
+              <div className="flex gap-4">
+                {/* Quantity Selector */}
+                <div className="flex items-center border border-stone-300 px-4 py-2 bg-white">
+                  <button onClick={() => setQuantity(q => Math.max(1, q-1))} className="px-2 hover:text-[#A33B26]">-</button>
+                  <span className="px-4 font-bold min-w-[40px] text-center">{quantity}</span>
+                  <button onClick={() => setQuantity(q => q+1)} className="px-2 hover:text-[#A33B26]">+</button>
+                </div>
+                
+                {/* Add to Collection Button */}
+                <button className="flex-grow border border-stone-900 text-stone-900 font-bold uppercase tracking-widest text-xs py-4 hover:bg-stone-900 hover:text-white transition flex items-center justify-center gap-2">
+                  <ShoppingBag className="w-4 h-4" /> Add to Collection
+                </button>
               </div>
-              <button className="flex-grow brand-bg text-white font-bold uppercase tracking-widest text-xs py-4 hover:opacity-90 transition">
-                Add to Collection
+
+              {/* PRIMARY BUY NOW BUTTON */}
+              <button 
+                onClick={handleBuyNow}
+                className="w-full brand-bg text-white font-bold uppercase tracking-widest text-xs py-5 hover:opacity-90 transition flex items-center justify-center gap-2 shadow-lg"
+              >
+                <CreditCard className="w-4 h-4" /> Buy Now & Support Heritage
               </button>
             </div>
 
@@ -109,7 +130,6 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
