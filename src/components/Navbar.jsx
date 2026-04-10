@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShoppingBag } from 'lucide-react'; // Added ShoppingBag
+import Cart from './Cart'; // 1. Import your new Cart component
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false); // 2. State to control Cart sidebar
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -24,7 +26,7 @@ export default function Navbar() {
 
       {/* Main Navigation */}
       <nav className="flex justify-between items-center px-6 md:px-10 py-6 sticky top-0 z-50 bg-[#F9F7F2]/95 backdrop-blur-md border-b border-stone-200">
-        <div className="logo-box brand-color">
+        <div className="logo-box brand-color cursor-pointer" onClick={() => window.location.href='/'}>
           <div className="text-xl serif tracking-tighter">SOMAGOM</div>
         </div>
         
@@ -38,15 +40,29 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center space-x-4">
+          {/* 3. CART ICON BUTTON */}
+          <button 
+            onClick={() => setIsCartOpen(true)} 
+            className="p-2 text-stone-800 hover:brand-color transition relative"
+          >
+            <ShoppingBag size={24} strokeWidth={1.5} />
+            {/* Optional: Small badge for cart count */}
+            <span className="absolute top-0 right-0 bg-[#A33B26] text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center">0</span>
+          </button>
+
           <a href="/login" className="hidden md:block brand-bg px-6 py-2 text-xs uppercase font-bold text-white hover:opacity-90 transition">
             Login
           </a>
+
           {/* Mobile Toggle Button */}
           <button onClick={toggleMenu} className="md:hidden text-stone-800 p-2">
             <Menu size={32} />
           </button>
         </div>
       </nav>
+
+      {/* 4. THE CART SIDEBAR COMPONENT */}
+      <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 }

@@ -12,6 +12,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Checkout from './pages/Checkout';
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
+import UserDashboard from "./pages/UserDashboard";
 
 function App() {
   const location = useLocation();
@@ -46,6 +47,7 @@ function App() {
           {/* 3. Ensure path matches your hideLayout check exactly */}
           <Route path="/payment/fail" element={<PaymentCancel />} />
           <Route path="/payment/cancel" element={<PaymentCancel />} />
+          <Route path="/dashboard" element={<UserDashboard />} />
         </Routes>
       </div>
 
