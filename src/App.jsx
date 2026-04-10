@@ -13,6 +13,7 @@ import Checkout from './pages/Checkout';
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import UserDashboard from "./pages/UserDashboard";
+import Reviews from "./pages/Reviews";
 
 function App() {
   const location = useLocation();
@@ -48,6 +49,7 @@ function App() {
           <Route path="/payment/fail" element={<PaymentCancel />} />
           <Route path="/payment/cancel" element={<PaymentCancel />} />
           <Route path="/dashboard" element={<UserDashboard />} />
+          <Route path="/reviews" element={<Reviews />} />
         </Routes>
       </div>
 

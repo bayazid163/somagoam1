@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { Star } from 'lucide-react'; // Added Star icon import
 
 // Import images (Ensure these are in src/assets)
 import shataranji from '../assets/shataranji.png';
@@ -17,17 +18,17 @@ import craftStory from '../assets/craft_story.jpg';
 export default function Crafts() {
   const { addToCart } = useCart();
 
-  // Added 'basePrice' as a Number for mathematical calculations in the Cart/Checkout
+  // Added 'rating' field to keep parity with Food and Fashion pages
   const crafts = [
-    { name: "Jessore Shotoronji", region: "Jessore", img: shataranji, status: "GI Status", type: "Textile Craft", price: "৳ 3,500", basePrice: 3500, desc: "Traditional hand-woven floor mats featuring rhythmic patterns and organic dyes." },
-    { name: "Nakshi Kantha", region: "Mymensingh", img: nakshiKatha, status: "GI Status", type: "Textile Craft", price: "৳ 3,000", basePrice: 3000, desc: "Hand-embroidered quilts telling stories of rural life through every stitch." },
-    { name: "Shital Pati", region: "Sylhet", img: shitalPati, status: "GI Status", type: "Cane Craft", price: "৳ 2,500", basePrice: 2500, desc: "Cool-feeling mats hand-woven from Murta cane, recognized by UNESCO." },
-    { name: "Heritage Pottery", region: "Dhamrai", img: pottery, status: "Local Heritage", type: "Clay Craft", price: "৳ 300", basePrice: 300, desc: "Terracotta and glazed clay work crafted using ancient wood-fired kilns." },
-    { name: "Bamboo & Cane", region: "Sylhet", img: bamboo, status: "Local Heritage", type: "Utility Craft", price: "৳ 500", basePrice: 500, desc: "Sustainable utility items, from baskets to sophisticated home decor." },
-    { name: "Brass & Bell Metal", region: "Dhamrai", img: metal, status: "Local Heritage", type: "Metal Craft", price: "৳ 2,000", basePrice: 2000, desc: "Lost-wax casting method used to create royal tableware and statues." },
-    { name: "Wood Carving", region: "Dinajpur", img: wood, status: "Local Heritage", type: "Wood Craft", price: "৳ 1,500", basePrice: 1500, desc: "Intricate relief carving on seasoned wood for traditional doors." },
-    { name: "Jute Handicrafts", region: "Faridpur", img: jute, status: "Local Heritage", type: "Eco Craft", price: "৳ 300", basePrice: 300, desc: "Biodegradable fashion bags and home textiles from the 'Golden Fiber'." },
-    { name: "Tribal Handicrafts", region: "Hill Tracts", img: jewelry, status: "Local Heritage", type: "Ethnic Craft", price: "৳ 800", basePrice: 800, desc: "Traditional jewelry reflecting the diverse ethnic groups of CHT." },
+    { name: "Jessore Shotoronji", region: "Jessore", img: shataranji, status: "GI Status", type: "Textile Craft", price: "৳ 3,500", basePrice: 3500, rating: 5, desc: "Traditional hand-woven floor mats featuring rhythmic patterns and organic dyes." },
+    { name: "Nakshi Kantha", region: "Mymensingh", img: nakshiKatha, status: "GI Status", type: "Textile Craft", price: "৳ 3,000", basePrice: 3000, rating: 5, desc: "Hand-embroidered quilts telling stories of rural life through every stitch." },
+    { name: "Shital Pati", region: "Sylhet", img: shitalPati, status: "GI Status", type: "Cane Craft", price: "৳ 2,500", basePrice: 2500, rating: 4, desc: "Cool-feeling mats hand-woven from Murta cane, recognized by UNESCO." },
+    { name: "Heritage Pottery", region: "Dhamrai", img: pottery, status: "Local Heritage", type: "Clay Craft", price: "৳ 300", basePrice: 300, rating: 4, desc: "Terracotta and glazed clay work crafted using ancient wood-fired kilns." },
+    { name: "Bamboo & Cane", region: "Sylhet", img: bamboo, status: "Local Heritage", type: "Utility Craft", price: "৳ 500", basePrice: 500, rating: 5, desc: "Sustainable utility items, from baskets to sophisticated home decor." },
+    { name: "Brass & Bell Metal", region: "Dhamrai", img: metal, status: "Local Heritage", type: "Metal Craft", price: "৳ 2,000", basePrice: 2000, rating: 5, desc: "Lost-wax casting method used to create royal tableware and statues." },
+    { name: "Wood Carving", region: "Dinajpur", img: wood, status: "Local Heritage", type: "Wood Craft", price: "৳ 1,500", basePrice: 1500, rating: 4, desc: "Intricate relief carving on seasoned wood for traditional doors." },
+    { name: "Jute Handicrafts", region: "Faridpur", img: jute, status: "Local Heritage", type: "Eco Craft", price: "৳ 300", basePrice: 300, rating: 5, desc: "Biodegradable fashion bags and home textiles from the 'Golden Fiber'." },
+    { name: "Tribal Handicrafts", region: "Hill Tracts", img: jewelry, status: "Local Heritage", type: "Ethnic Craft", price: "৳ 800", basePrice: 800, rating: 5, desc: "Traditional jewelry reflecting the diverse ethnic groups of CHT." },
   ];
 
   return (
@@ -71,12 +72,22 @@ export default function Crafts() {
                   </div>
                   
                   <Link to={`/product/${productSlug}`}>
-                    <h3 className="text-2xl serif mb-3 hover:text-[#A33B26] transition-colors">{item.name}</h3>
+                    <h3 className="text-2xl serif mb-1 hover:text-[#A33B26] transition-colors">{item.name}</h3>
                   </Link>
+
+                  {/* Rating Display Integrated Here */}
+                  <div className="flex items-center gap-1 mb-4">
+                    <div className="flex text-[#A33B26]">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={10} fill={i < item.rating ? "currentColor" : "none"} />
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-stone-400 font-bold">({item.rating}.0)</span>
+                  </div>
                   
                   <p className="text-stone-500 text-xs leading-relaxed flex-grow">{item.desc}</p>
                   
-                  {/* Action Section: Price and Buttons in one clean row */}
+                  {/* Action Section */}
                   <div className="pt-6 border-t border-stone-100 flex justify-between items-center mt-4">
                     <span className="text-lg font-light">{item.price}</span>
                     

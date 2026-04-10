@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingBag, CreditCard } from 'lucide-react'; // Added icons for the buttons
+import { ShoppingBag, CreditCard, Star, MessageSquare, ShieldCheck, Camera, User } from 'lucide-react';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -24,10 +24,31 @@ export default function ProductDetail() {
     shipping: "7-10 Days (Global Shipping Available)"
   };
 
-  // Function to handle the "Buy Now" click
+  // Mock reviews data (moved inside ProductDetail)
+  const [reviews] = useState([
+    {
+      id: 1,
+      user: "Anika T.",
+      product: "Premium Dhakai Jamdani",
+      rating: 5,
+      date: "March 20, 2026",
+      comment: "The weave is incredibly fine. You can really tell the difference with a GI-certified product. The packaging was also very elegant.",
+      location: "Dhaka",
+      verified: true
+    },
+    {
+      id: 2,
+      user: "Rahat M.",
+      product: "Traditional Roshmalai",
+      rating: 4,
+      date: "April 02, 2026",
+      comment: "Delivered chilled and fresh to my door in Sylhet. Tastes just like the ones I used to have in Cumilla during my childhood.",
+      location: "Sylhet",
+      verified: true
+    }
+  ]);
+
   const handleBuyNow = () => {
-    // In the future, you can add logic here to pass this specific item 
-    // to your Checkout state or Cart context.
     navigate('/checkout');
   };
 
@@ -40,7 +61,7 @@ export default function ProductDetail() {
         <span className="text-stone-900 ml-2 font-bold">{product.name}</span>
       </nav>
 
-      <div className="px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div className="px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
         
         {/* Left: Image Gallery */}
         <div className="lg:col-span-7 space-y-4">
@@ -77,23 +98,18 @@ export default function ProductDetail() {
               </ul>
             </div>
 
-            {/* Selection & Action Area */}
             <div className="space-y-4 mb-8">
               <div className="flex gap-4">
-                {/* Quantity Selector */}
                 <div className="flex items-center border border-stone-300 px-4 py-2 bg-white">
                   <button onClick={() => setQuantity(q => Math.max(1, q-1))} className="px-2 hover:text-[#A33B26]">-</button>
                   <span className="px-4 font-bold min-w-[40px] text-center">{quantity}</span>
                   <button onClick={() => setQuantity(q => q+1)} className="px-2 hover:text-[#A33B26]">+</button>
                 </div>
-                
-                {/* Add to Collection Button */}
                 <button className="flex-grow border border-stone-900 text-stone-900 font-bold uppercase tracking-widest text-xs py-4 hover:bg-stone-900 hover:text-white transition flex items-center justify-center gap-2">
-                  <ShoppingBag className="w-4 h-4" /> Add to Collection
+                  <ShoppingBag className="w-4 h-4" /> Add to Bag
                 </button>
               </div>
 
-              {/* PRIMARY BUY NOW BUTTON */}
               <button 
                 onClick={handleBuyNow}
                 className="w-full brand-bg text-white font-bold uppercase tracking-widest text-xs py-5 hover:opacity-90 transition flex items-center justify-center gap-2 shadow-lg"
@@ -102,7 +118,6 @@ export default function ProductDetail() {
               </button>
             </div>
 
-            {/* Heritage Sidebar (GI Info) */}
             <div className="bg-white border border-[#A33B26]/10 p-6 rounded-sm space-y-6 shadow-sm">
               <div className="flex items-start gap-4">
                 <div className="text-xl text-[#A33B26] pt-1">🔬</div>
@@ -111,7 +126,6 @@ export default function ProductDetail() {
                   <p className="text-[12px] text-stone-500">{product.giStatus} - Authenticated by Somagom Protocol.</p>
                 </div>
               </div>
-
               <div className="flex items-start gap-4">
                 <div className="text-xl text-[#A33B26] pt-1">👨‍🎨</div>
                 <div>
@@ -119,7 +133,6 @@ export default function ProductDetail() {
                   <p className="text-[12px] text-stone-500">{product.artisan.name}, a veteran from {product.artisan.village}.</p>
                 </div>
               </div>
-
               <div className="flex items-start gap-4">
                 <div className="text-xl text-[#A33B26] pt-1">🚚</div>
                 <div>
@@ -128,6 +141,91 @@ export default function ProductDetail() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* REVIEWS SECTION INTEGRATED BELOW */}
+      <hr className="border-stone-200 mx-6 md:mx-10" />
+      
+      <div className="py-16 px-6 md:px-10">
+        <div className="max-w-5xl mx-auto text-center mb-16">
+          <h2 className="text-4xl md:text-5xl serif mb-4 text-stone-900">Heritage Voices</h2>
+          <p className="text-[#A33B26] uppercase tracking-[0.2em] text-[10px] font-bold">
+            Authentic Experiences from our Global Community
+          </p>
+        </div>
+
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1">
+            <div className="bg-white border border-stone-200 p-8 sticky top-28 shadow-sm rounded-sm">
+              <h3 className="serif text-2xl mb-4">Overall Rating</h3>
+              <div className="flex items-center gap-2 mb-6">
+                <div className="flex text-[#A33B26]">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={20} fill={i < 4 ? "currentColor" : "none"} className="text-[#A33B26]" />
+                  ))}
+                </div>
+                <span className="font-bold text-lg text-stone-800">4.9 / 5.0</span>
+              </div>
+              <p className="text-sm text-stone-500 leading-relaxed mb-8">
+                Based on 1,240 verified purchases. Every review is checked against our GI-Traceability protocol to ensure Somagom authenticity.
+              </p>
+              <button className="w-full brand-bg text-white py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition flex items-center justify-center gap-2">
+                <MessageSquare size={16} /> Share Your Story
+              </button>
+            </div>
+          </div>
+
+          <div className="lg:col-span-2 space-y-8">
+            {reviews.map((rev) => (
+              <div key={rev.id} className="bg-white border border-stone-200 p-8 rounded-sm shadow-sm">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center text-stone-400">
+                      <User size={24} />
+                    </div>
+                    <div>
+                      <div className="flex text-[#A33B26] mb-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={12} fill={i < rev.rating ? "currentColor" : "none"} />
+                        ))}
+                      </div>
+                      <h4 className="font-bold text-stone-900">{rev.user}</h4>
+                      <p className="text-[10px] text-stone-400 uppercase tracking-widest">
+                        {rev.location} • {rev.date}
+                      </p>
+                    </div>
+                  </div>
+                  {rev.verified && (
+                    <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-tighter text-green-700 bg-green-50 px-2 py-1 border border-green-100">
+                      <ShieldCheck size={12} /> GI Verified Buyer
+                    </div>
+                  )}
+                </div>
+
+                <div className="mb-4">
+                  <span className="text-[10px] font-bold uppercase text-[#A33B26] bg-[#A33B26]/5 px-2 py-1 border border-[#A33B26]/10">
+                    {rev.product}
+                  </span>
+                </div>
+
+                <p className="text-stone-600 leading-relaxed italic text-sm">
+                  "{rev.comment}"
+                </p>
+                
+                <div className="mt-6 flex gap-4">
+                   <div className="w-16 h-16 bg-stone-50 rounded-sm flex items-center justify-center border border-dashed border-stone-200">
+                      <Camera size={18} className="text-stone-300" />
+                   </div>
+                   <div className="flex-grow flex items-center">
+                      <p className="text-[10px] text-stone-400 font-medium italic">
+                        User-uploaded image verified by Somagom IT Crew
+                      </p>
+                   </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

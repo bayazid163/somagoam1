@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { Star } from 'lucide-react'; // Added Star icon import
 
 // Import images
 import dhakaJamdani from '../assets/dhaka_jamdani.jpg';
@@ -15,15 +16,15 @@ import sareeStory from '../assets/saree_story.jpg';
 export default function Fashion() {
   const { addToCart } = useCart();
 
-  // Data array updated with basePrice for the checkout calculations
+  // Data array updated with basePrice and added rating field
   const products = [
-    { name: "Dhakai Jamdani", region: "Dhaka", img: dhakaJamdani, type: "Saree", cert: "GI Certified", price: "৳ 10,000", basePrice: 10000, shelfLife: "stable", desc: "Exquisite hand-loomed muslin with intricate motifs." },
-    { name: "Tangail Tant Saree", region: "Tangail", img: tangailSaree, type: "Saree", cert: "GI Certified", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Traditional cotton weaves known for refined borders." },
-    { name: "Rajshahi Silk Saree", region: "Rajshahi", img: rajshahiSilk, type: "Saree", cert: "GI Certified", price: "৳ 15,000", basePrice: 15000, shelfLife: "stable", desc: "Pure Mulberry silk, famous for luxurious texture." },
-    { name: "Khadi Garments", region: "Cumilla", img: khadiPanjabi, type: "Wearable", cert: "Local Heritage", price: "৳ 1,200", basePrice: 1200, shelfLife: "stable", desc: "Hand-spun, hand-woven fabric that breathes." },
-    { name: "Monipuri Dress", region: "Sylhet", img: monipuri, type: "Wearable", cert: "Local Heritage", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Distinctive geometric patterns from the community." },
-    { name: "Handloom Cotton", region: "Pabna", img: halfSilk, type: "Saree", cert: "Local Heritage", price: "৳ 2,000", basePrice: 2000, shelfLife: "stable", desc: "Soft daily wear sarees from weaver colonies." },
-    { name: "Ethnic Wear", region: "Hill Tracts", img: chakmaDress, type: "Wearable", cert: "Local Heritage", price: "৳ 1,500", basePrice: 1500, shelfLife: "stable", desc: "Back-strap loom fabrics reflecting tribal culture." },
+    { name: "Dhakai Jamdani", region: "Dhaka", img: dhakaJamdani, type: "Saree", cert: "GI Certified", price: "৳ 10,000", basePrice: 10000, shelfLife: "stable", desc: "Exquisite hand-loomed muslin with intricate motifs.", rating: 5 },
+    { name: "Tangail Tant Saree", region: "Tangail", img: tangailSaree, type: "Saree", cert: "GI Certified", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Traditional cotton weaves known for refined borders.", rating: 4 },
+    { name: "Rajshahi Silk Saree", region: "Rajshahi", img: rajshahiSilk, type: "Saree", cert: "GI Certified", price: "৳ 15,000", basePrice: 15000, shelfLife: "stable", desc: "Pure Mulberry silk, famous for luxurious texture.", rating: 5 },
+    { name: "Khadi Garments", region: "Cumilla", img: khadiPanjabi, type: "Wearable", cert: "Local Heritage", price: "৳ 1,200", basePrice: 1200, shelfLife: "stable", desc: "Hand-spun, hand-woven fabric that breathes.", rating: 4 },
+    { name: "Monipuri Dress", region: "Sylhet", img: monipuri, type: "Wearable", cert: "Local Heritage", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Distinctive geometric patterns from the community.", rating: 5 },
+    { name: "Handloom Cotton", region: "Pabna", img: halfSilk, type: "Saree", cert: "Local Heritage", price: "৳ 2,000", basePrice: 2000, shelfLife: "stable", desc: "Soft daily wear sarees from weaver colonies.", rating: 4 },
+    { name: "Ethnic Wear", region: "Hill Tracts", img: chakmaDress, type: "Wearable", cert: "Local Heritage", price: "৳ 1,500", basePrice: 1500, shelfLife: "stable", desc: "Back-strap loom fabrics reflecting tribal culture.", rating: 5 },
   ];
 
   return (
@@ -70,6 +71,16 @@ export default function Fashion() {
                   <Link to={`/product/${productSlug}`}>
                     <h3 className="serif text-xl mb-1 hover:text-[#A33B26] transition-colors">{item.name}</h3>
                   </Link>
+
+                  {/* Rating Option Section */}
+                  <div className="flex items-center gap-1 mb-2">
+                    <div className="flex text-[#A33B26]">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={10} fill={i < item.rating ? "currentColor" : "none"} />
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-stone-400 font-bold">({item.rating}.0)</span>
+                  </div>
                   
                   <p className="text-stone-500 text-xs flex-grow mb-4">{item.desc}</p>
                   

@@ -84,15 +84,15 @@ export default function Login() {
           <div className="flex-1 border-b border-stone-100"></div>
         </div>
 
-        <div className="flex gap-3 mb-8">
-          <button className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors">
+        {/* Updated Social Login: Apple Removed */}
+        <div className="flex gap-4 mb-8">
+          <button className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors gap-2">
             <i className="fab fa-google text-[#DB4437]"></i>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-600">Google</span>
           </button>
-          <button className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors">
+          <button className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors gap-2">
             <i className="fab fa-facebook-f text-[#4267B2]"></i>
-          </button>
-          <button className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors">
-            <i className="fab fa-apple text-black"></i>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-600">Facebook</span>
           </button>
         </div>
 
