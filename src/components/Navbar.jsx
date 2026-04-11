@@ -1,32 +1,47 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom'; // Use NavLink for active states
-import { Menu, X, ShoppingBag } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Menu, X, ShoppingBag, Search } from 'lucide-react';
 import Cart from './Cart';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false); // New state for search
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // Helper function for active styles to keep code clean
   const getNavLinkClass = ({ isActive }) => 
     `transition-colors duration-300 ${
       isActive 
-        ? 'brand-color' // Color when active
-        : 'text-stone-500 hover:brand-color' // Color when inactive
+        ? 'brand-color' 
+        : 'text-stone-500 hover:brand-color'
     }`;
 
   return (
     <>
+      {/* Search Overlay - Slides down from the top */}
+      <div className={`fixed top-0 left-0 w-full bg-[#F9F7F2] z-[60] border-b border-stone-200 transition-all duration-500 ease-in-out ${isSearchOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+        <div className="max-w-6xl mx-auto px-6 py-10 flex items-center space-x-4">
+          <Search size={24} className="text-stone-400" />
+          <input 
+            type="text" 
+            placeholder="Search heritage fashion, food, or crafts..." 
+            className="w-full bg-transparent border-none outline-none text-xl serif placeholder:text-stone-300"
+            autoFocus={isSearchOpen}
+          />
+          <button onClick={() => setIsSearchOpen(false)} className="p-2 hover:rotate-90 transition-transform duration-300">
+            <X size={30} className="text-stone-500" />
+          </button>
+        </div>
+      </div>
+
       {/* Mobile Menu Overlay */}
       <div className={`fixed inset-0 z-[100] bg-[#F9F7F2] p-10 flex flex-col space-y-8 text-2xl serif transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden`}>
         <button onClick={toggleMenu} className="absolute top-8 right-10 text-stone-500">
           <X size={40} />
         </button>
         
-        {/* Mobile NavLinks */}
         <NavLink to="/" end className={getNavLinkClass} onClick={toggleMenu}>Home</NavLink>
         <NavLink to="/fashion" className={getNavLinkClass} onClick={toggleMenu}>Fashion</NavLink>
         <NavLink to="/food" className={getNavLinkClass} onClick={toggleMenu}>GI Food</NavLink>
@@ -43,7 +58,6 @@ export default function Navbar() {
           <div className="text-xl serif tracking-tighter uppercase font-bold">SOMAGOM</div>
         </div>
         
-        {/* Desktop Links - Using NavLink for Active State detection */}
         <div className="hidden md:flex space-x-8 text-[11px] uppercase tracking-widest font-bold">
           <NavLink to="/" end className={getNavLinkClass}>Home</NavLink>
           <NavLink to="/fashion" className={getNavLinkClass}>Fashion</NavLink>
@@ -53,10 +67,20 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* CART ICON BUTTON */}
+          {/* SEARCH BUTTON - Now functional */}
+          <button 
+            onClick={() => setIsSearchOpen(true)}
+            className="p-2 text-stone-800 hover:brand-color transition"
+            aria-label="Open search"
+          >
+            <Search size={22} strokeWidth={1.5} />
+          </button>
+
+          {/* CART ICON BUTTON - Now functional */}
           <button 
             onClick={() => setIsCartOpen(true)} 
             className="p-2 text-stone-800 hover:brand-color transition relative"
+            aria-label="Open cart"
           >
             <ShoppingBag size={24} strokeWidth={1.5} />
             <span className="absolute top-0 right-0 bg-[#A33B26] text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center">0</span>
@@ -66,14 +90,12 @@ export default function Navbar() {
             Login
           </NavLink>
 
-          {/* Mobile Toggle Button */}
           <button onClick={toggleMenu} className="md:hidden text-stone-800 p-2">
             <Menu size={32} />
           </button>
         </div>
       </nav>
 
-      {/* THE CART SIDEBAR COMPONENT */}
       <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
