@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { Star } from 'lucide-react'; // Added Star icon import
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Import images
 import dhakaJamdani from '../assets/dhaka_jamdani.jpg';
@@ -15,17 +15,32 @@ import sareeStory from '../assets/saree_story.jpg';
 
 export default function Fashion() {
   const { addToCart } = useCart();
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
 
-  // Data array updated with basePrice and added rating field
+  // Data array updated with basePrice, rating, and reviewCount
   const products = [
-    { name: "Dhakai Jamdani", region: "Dhaka", img: dhakaJamdani, type: "Saree", cert: "GI Certified", price: "৳ 10,000", basePrice: 10000, shelfLife: "stable", desc: "Exquisite hand-loomed muslin with intricate motifs.", rating: 5 },
-    { name: "Tangail Tant Saree", region: "Tangail", img: tangailSaree, type: "Saree", cert: "GI Certified", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Traditional cotton weaves known for refined borders.", rating: 4 },
-    { name: "Rajshahi Silk Saree", region: "Rajshahi", img: rajshahiSilk, type: "Saree", cert: "GI Certified", price: "৳ 15,000", basePrice: 15000, shelfLife: "stable", desc: "Pure Mulberry silk, famous for luxurious texture.", rating: 5 },
-    { name: "Khadi Garments", region: "Cumilla", img: khadiPanjabi, type: "Wearable", cert: "Local Heritage", price: "৳ 1,200", basePrice: 1200, shelfLife: "stable", desc: "Hand-spun, hand-woven fabric that breathes.", rating: 4 },
-    { name: "Monipuri Dress", region: "Sylhet", img: monipuri, type: "Wearable", cert: "Local Heritage", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Distinctive geometric patterns from the community.", rating: 5 },
-    { name: "Handloom Cotton", region: "Pabna", img: halfSilk, type: "Saree", cert: "Local Heritage", price: "৳ 2,000", basePrice: 2000, shelfLife: "stable", desc: "Soft daily wear sarees from weaver colonies.", rating: 4 },
-    { name: "Ethnic Wear", region: "Hill Tracts", img: chakmaDress, type: "Wearable", cert: "Local Heritage", price: "৳ 1,500", basePrice: 1500, shelfLife: "stable", desc: "Back-strap loom fabrics reflecting tribal culture.", rating: 5 },
+    { name: "Dhakai Jamdani", region: "Dhaka", img: dhakaJamdani, type: "Saree", cert: "GI Certified", price: "৳ 10,000", basePrice: 10000, shelfLife: "stable", desc: "Exquisite hand-loomed muslin with intricate motifs.", rating: 5, reviewCount: 124 },
+    { name: "Tangail Tant Saree", region: "Tangail", img: tangailSaree, type: "Saree", cert: "GI Certified", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Traditional cotton weaves known for refined borders.", rating: 4, reviewCount: 89 },
+    { name: "Rajshahi Silk Saree", region: "Rajshahi", img: rajshahiSilk, type: "Saree", cert: "GI Certified", price: "৳ 15,000", basePrice: 15000, shelfLife: "stable", desc: "Pure Mulberry silk, famous for luxurious texture.", rating: 5, reviewCount: 56 },
+    { name: "Khadi Garments", region: "Cumilla", img: khadiPanjabi, type: "Wearable", cert: "Local Heritage", price: "৳ 1,200", basePrice: 1200, shelfLife: "stable", desc: "Hand-spun, hand-woven fabric that breathes.", rating: 4, reviewCount: 210 },
+    { name: "Monipuri Dress", region: "Sylhet", img: monipuri, type: "Wearable", cert: "Local Heritage", price: "৳ 2,500", basePrice: 2500, shelfLife: "stable", desc: "Distinctive geometric patterns from the community.", rating: 5, reviewCount: 45 },
+    { name: "Handloom Cotton", region: "Pabna", img: halfSilk, type: "Saree", cert: "Local Heritage", price: "৳ 2,000", basePrice: 2000, shelfLife: "stable", desc: "Soft daily wear sarees from weaver colonies.", rating: 4, reviewCount: 78 },
+    { name: "Ethnic Wear", region: "Hill Tracts", img: chakmaDress, type: "Wearable", cert: "Local Heritage", price: "৳ 1,500", basePrice: 1500, shelfLife: "stable", desc: "Back-strap loom fabrics reflecting tribal culture.", rating: 5, reviewCount: 32 },
   ];
+
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentProducts = products.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="bg-[#F9F7F2]">
@@ -41,7 +56,7 @@ export default function Fashion() {
       {/* Product Grid */}
       <main className="px-10 py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((item, index) => {
+          {currentProducts.map((item, index) => {
             const productSlug = item.name.toLowerCase().replace(/\s+/g, '-');
 
             return (
@@ -72,14 +87,16 @@ export default function Fashion() {
                     <h3 className="serif text-xl mb-1 hover:text-[#A33B26] transition-colors">{item.name}</h3>
                   </Link>
 
-                  {/* Rating Option Section */}
+                  {/* Rating Section with Peer Counts */}
                   <div className="flex items-center gap-1 mb-2">
                     <div className="flex text-[#A33B26]">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} size={10} fill={i < item.rating ? "currentColor" : "none"} />
                       ))}
                     </div>
-                    <span className="text-[10px] text-stone-400 font-bold">({item.rating}.0)</span>
+                    <span className="text-[10px] text-stone-400 font-bold">
+                      ({item.rating}.0) <span className="ml-1 font-normal italic">from {item.reviewCount} persons</span>
+                    </span>
                   </div>
                   
                   <p className="text-stone-500 text-xs flex-grow mb-4">{item.desc}</p>
@@ -107,6 +124,41 @@ export default function Fashion() {
               </div>
             );
           })}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="mt-16 flex justify-center items-center gap-4">
+          <button 
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="p-2 border border-stone-200 rounded-full disabled:opacity-30 hover:bg-stone-100 transition-colors"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          
+          <div className="flex gap-2">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => paginate(i + 1)}
+                className={`w-8 h-8 text-[10px] font-bold rounded-full transition-all ${
+                  currentPage === i + 1 
+                  ? 'brand-bg text-white' 
+                  : 'border border-stone-200 text-stone-400 hover:border-[#A33B26]'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+
+          <button 
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="p-2 border border-stone-200 rounded-full disabled:opacity-30 hover:bg-stone-100 transition-colors"
+          >
+            <ChevronRight size={16} />
+          </button>
         </div>
       </main>
 

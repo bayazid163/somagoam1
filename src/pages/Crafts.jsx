@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { Star } from 'lucide-react'; // Added Star icon import
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Import images (Ensure these are in src/assets)
+// Import images
 import shataranji from '../assets/shataranji.png';
 import nakshiKatha from '../assets/nakshi_katha.jpg';
 import shitalPati from '../assets/shital_pati.jpg';
@@ -18,18 +18,33 @@ import craftStory from '../assets/craft_story.jpg';
 export default function Crafts() {
   const { addToCart } = useCart();
 
-  // Added 'rating' field to keep parity with Food and Fashion pages
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  // Data array with rating and reviewCount added
   const crafts = [
-    { name: "Jessore Shotoronji", region: "Jessore", img: shataranji, status: "GI Status", type: "Textile Craft", price: "৳ 3,500", basePrice: 3500, rating: 5, desc: "Traditional hand-woven floor mats featuring rhythmic patterns and organic dyes." },
-    { name: "Nakshi Kantha", region: "Mymensingh", img: nakshiKatha, status: "GI Status", type: "Textile Craft", price: "৳ 3,000", basePrice: 3000, rating: 5, desc: "Hand-embroidered quilts telling stories of rural life through every stitch." },
-    { name: "Shital Pati", region: "Sylhet", img: shitalPati, status: "GI Status", type: "Cane Craft", price: "৳ 2,500", basePrice: 2500, rating: 4, desc: "Cool-feeling mats hand-woven from Murta cane, recognized by UNESCO." },
-    { name: "Heritage Pottery", region: "Dhamrai", img: pottery, status: "Local Heritage", type: "Clay Craft", price: "৳ 300", basePrice: 300, rating: 4, desc: "Terracotta and glazed clay work crafted using ancient wood-fired kilns." },
-    { name: "Bamboo & Cane", region: "Sylhet", img: bamboo, status: "Local Heritage", type: "Utility Craft", price: "৳ 500", basePrice: 500, rating: 5, desc: "Sustainable utility items, from baskets to sophisticated home decor." },
-    { name: "Brass & Bell Metal", region: "Dhamrai", img: metal, status: "Local Heritage", type: "Metal Craft", price: "৳ 2,000", basePrice: 2000, rating: 5, desc: "Lost-wax casting method used to create royal tableware and statues." },
-    { name: "Wood Carving", region: "Dinajpur", img: wood, status: "Local Heritage", type: "Wood Craft", price: "৳ 1,500", basePrice: 1500, rating: 4, desc: "Intricate relief carving on seasoned wood for traditional doors." },
-    { name: "Jute Handicrafts", region: "Faridpur", img: jute, status: "Local Heritage", type: "Eco Craft", price: "৳ 300", basePrice: 300, rating: 5, desc: "Biodegradable fashion bags and home textiles from the 'Golden Fiber'." },
-    { name: "Tribal Handicrafts", region: "Hill Tracts", img: jewelry, status: "Local Heritage", type: "Ethnic Craft", price: "৳ 800", basePrice: 800, rating: 5, desc: "Traditional jewelry reflecting the diverse ethnic groups of CHT." },
+    { name: "Jessore Shotoronji", region: "Jessore", img: shataranji, status: "GI Status", type: "Textile Craft", price: "৳ 3,500", basePrice: 3500, rating: 5, reviewCount: 42, desc: "Traditional hand-woven floor mats featuring rhythmic patterns and organic dyes." },
+    { name: "Nakshi Kantha", region: "Mymensingh", img: nakshiKatha, status: "GI Status", type: "Textile Craft", price: "৳ 3,000", basePrice: 3000, rating: 5, reviewCount: 156, desc: "Hand-embroidered quilts telling stories of rural life through every stitch." },
+    { name: "Shital Pati", region: "Sylhet", img: shitalPati, status: "GI Status", type: "Cane Craft", price: "৳ 2,500", basePrice: 2500, rating: 4, reviewCount: 88, desc: "Cool-feeling mats hand-woven from Murta cane, recognized by UNESCO." },
+    { name: "Heritage Pottery", region: "Dhamrai", img: pottery, status: "Local Heritage", type: "Clay Craft", price: "৳ 300", basePrice: 300, rating: 4, reviewCount: 215, desc: "Terracotta and glazed clay work crafted using ancient wood-fired kilns." },
+    { name: "Bamboo & Cane", region: "Sylhet", img: bamboo, status: "Local Heritage", type: "Utility Craft", price: "৳ 500", basePrice: 500, rating: 5, reviewCount: 67, desc: "Sustainable utility items, from baskets to sophisticated home decor." },
+    { name: "Brass & Bell Metal", region: "Dhamrai", img: metal, status: "Local Heritage", type: "Metal Craft", price: "৳ 2,000", basePrice: 2000, rating: 5, reviewCount: 34, desc: "Lost-wax casting method used to create royal tableware and statues." },
+    { name: "Wood Carving", region: "Dinajpur", img: wood, status: "Local Heritage", type: "Wood Craft", price: "৳ 1,500", basePrice: 1500, rating: 4, reviewCount: 29, desc: "Intricate relief carving on seasoned wood for traditional doors." },
+    { name: "Jute Handicrafts", region: "Faridpur", img: jute, status: "Local Heritage", type: "Eco Craft", price: "৳ 300", basePrice: 300, rating: 5, reviewCount: 312, desc: "Biodegradable fashion bags and home textiles from the 'Golden Fiber'." },
+    { name: "Tribal Handicrafts", region: "Hill Tracts", img: jewelry, status: "Local Heritage", type: "Ethnic Craft", price: "৳ 800", basePrice: 800, rating: 5, reviewCount: 51, desc: "Traditional jewelry reflecting the diverse ethnic groups of CHT." },
   ];
+
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCrafts = crafts.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(crafts.length / itemsPerPage);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="bg-[#F9F7F2]">
@@ -45,7 +60,7 @@ export default function Crafts() {
       {/* Main Grid */}
       <main className="px-10 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {crafts.map((item, index) => {
+          {currentCrafts.map((item, index) => {
             const productSlug = item.name.toLowerCase().replace(/\s+/g, '-');
 
             return (
@@ -75,14 +90,16 @@ export default function Crafts() {
                     <h3 className="text-2xl serif mb-1 hover:text-[#A33B26] transition-colors">{item.name}</h3>
                   </Link>
 
-                  {/* Rating Display Integrated Here */}
+                  {/* Rating Display with Review Count */}
                   <div className="flex items-center gap-1 mb-4">
                     <div className="flex text-[#A33B26]">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} size={10} fill={i < item.rating ? "currentColor" : "none"} />
                       ))}
                     </div>
-                    <span className="text-[10px] text-stone-400 font-bold">({item.rating}.0)</span>
+                    <span className="text-[10px] text-stone-400 font-bold">
+                      ({item.rating}.0) <span className="ml-1 font-normal italic">by {item.reviewCount} collectors</span>
+                    </span>
                   </div>
                   
                   <p className="text-stone-500 text-xs leading-relaxed flex-grow">{item.desc}</p>
@@ -110,6 +127,41 @@ export default function Crafts() {
               </div>
             );
           })}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="mt-20 flex justify-center items-center gap-4">
+          <button 
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="p-3 border border-stone-200 rounded-full disabled:opacity-30 hover:bg-stone-100 transition-colors"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          
+          <div className="flex gap-3">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => paginate(i + 1)}
+                className={`w-10 h-10 text-[11px] font-bold rounded-full transition-all ${
+                  currentPage === i + 1 
+                  ? 'brand-bg text-white shadow-lg' 
+                  : 'border border-stone-200 text-stone-400 hover:border-[#A33B26]'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+
+          <button 
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="p-3 border border-stone-200 rounded-full disabled:opacity-30 hover:bg-stone-100 transition-colors"
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
       </main>
 
