@@ -1,20 +1,62 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 // Import your assets
 import logo from '../assets/logo.png';
 import mapBg from '../assets/map.png';
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // 1. State for credentials (Role removed)
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: '',
+  });
+
+  // 2. Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials(prev => ({ ...prev, [name]: value }));
+  };
+
+  // 3. Django Login Integration
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await axios.post('http://localhost:8000/dj-rest-auth/login/', {
+        username: credentials.email, 
+        email: credentials.email,
+        password: credentials.password
+      });
+
+      if (response.status === 200) {
+        // 4. Save the token
+        const token = response.data.key || response.data.access;
+        localStorage.setItem('token', token);
+        
+        alert("Login Successful!");
+        navigate('/dashboard'); 
+      }
+    } catch (err) {
+      const serverError = err.response?.data;
+      setError(serverError ? "Invalid email or password." : "Server unreachable. Check if Django is running.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex justify-center items-center bg-[#fcf8f7] relative px-5">
       {/* Background Map Overlay */}
       <div 
         className="fixed inset-0 pointer-events-none opacity-[0.15] z-0"
-        style={{ 
-          backgroundImage: `url(${mapBg})`, 
-          backgroundSize: 'cover', 
-          backgroundPosition: 'center' 
-        }}
+        style={{ backgroundImage: `url(${mapBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
       ></div>
 
       <div className="bg-white w-full max-w-[450px] p-10 md:p-12 rounded-[24px] shadow-lg border border-[#A33B26]/10 z-10">
@@ -27,7 +69,14 @@ export default function Login() {
         <h2 className="font-['Great_Vibes'] text-3xl text-[#333] text-center mb-1">Welcome</h2>
         <p className="text-center text-[#888] text-[11px] tracking-widest uppercase mb-8">Secure Login</p>
 
-        <form onSubmit={(e) => e.preventDefault()}>
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-[11px] font-bold uppercase">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          {/* Email Field */}
           <div className="relative mb-6">
             <label className="absolute -top-[9px] left-[15px] bg-white px-2 text-[11px] font-semibold text-[#A33B26] uppercase tracking-wider">
               Email Address
@@ -37,12 +86,16 @@ export default function Login() {
             </span>
             <input 
               type="email" 
+              name="email"
+              value={credentials.email}
+              onChange={handleChange}
               placeholder="email@example.com"
               className="w-full py-4 pl-12 pr-4 border border-[#e0c8c4] rounded-xl outline-none focus:border-[#A33B26] focus:ring-4 focus:ring-[#A33B26]/5 transition-all"
               required 
             />
           </div>
 
+          {/* Password Field */}
           <div className="relative mb-6">
             <label className="absolute -top-[9px] left-[15px] bg-white px-2 text-[11px] font-semibold text-[#A33B26] uppercase tracking-wider">
               Password
@@ -52,29 +105,23 @@ export default function Login() {
             </span>
             <input 
               type="password" 
+              name="password"
+              value={credentials.password}
+              onChange={handleChange}
               placeholder="••••••••••••"
               className="w-full py-4 pl-12 pr-4 border border-[#e0c8c4] rounded-xl outline-none focus:border-[#A33B26] focus:ring-4 focus:ring-[#A33B26]/5 transition-all"
               required 
             />
           </div>
 
-          <div className="relative mb-4">
-            <label className="absolute -top-[9px] left-[15px] bg-white px-2 text-[11px] font-semibold text-[#A33B26] uppercase tracking-wider">
-              Role
-            </label>
-            <span className="absolute left-[18px] top-1/2 -translate-y-1/2 text-[#A33B26]">
-              <i className="fa-solid fa-user-tag"></i>
-            </span>
-            <select className="w-full py-4 pl-12 pr-4 border border-[#e0c8c4] rounded-xl outline-none appearance-none bg-transparent">
-              <option value="consumer">Consumer</option>
-              <option value="producer">Producer</option>
-            </select>
-          </div>
-
           <a href="#" className="block text-right text-[12px] text-stone-400 mb-6 hover:text-[#A33B26]">Forgot password?</a>
 
-          <button type="submit" className="w-full py-4 bg-[#A33B26] text-white rounded-xl font-bold tracking-widest hover:bg-[#802e1e] transition-transform active:scale-95 shadow-md">
-            SIGN IN
+          <button 
+            type="submit" 
+            disabled={loading}
+            className={`w-full py-4 bg-[#A33B26] text-white rounded-xl font-bold tracking-widest transition-transform active:scale-95 shadow-md ${loading ? 'opacity-50' : 'hover:bg-[#802e1e]'}`}
+          >
+            {loading ? 'AUTHENTICATING...' : 'SIGN IN'}
           </button>
         </form>
 
@@ -84,7 +131,7 @@ export default function Login() {
           <div className="flex-1 border-b border-stone-100"></div>
         </div>
 
-        {/* Updated Social Login: Apple Removed */}
+        {/* Social Login Buttons */}
         <div className="flex gap-4 mb-8">
           <button className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors gap-2">
             <i className="fab fa-google text-[#DB4437]"></i>

@@ -1,45 +1,106 @@
-import React, { useState } from 'react';
-import { Package, Heart, Settings, LogOut, MapPin, Star, X, Camera, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Package, Heart, Settings, LogOut, MapPin, Star, X, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserDashboard() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('orders');
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
 
-  const user = {
-    name: "Marufa",
-    memberSince: "Nov 2025",
-    avatar: null
-  };
+  // --- INTEGRATION STATE ---
+  const [user, setUser] = useState({ name: "Collector", memberSince: "...", avatar: null });
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const orders = [
-    { id: "SOMA-9921", date: "April 02, 2026", status: "In Transit", total: "৳ 25,620", item: "Premium Dhakai Jamdani" },
-    { id: "SOMA-8812", date: "March 15, 2026", status: "Delivered", total: "৳ 1,420", item: "Traditional Roshmalai (2kg)" }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      try {
+        // 1. Fetch User Profile from dj-rest-auth
+        const userRes = await axios.get('http://localhost:8000/dj-rest-auth/user/', {
+          headers: { Authorization: `Token ${token}` }
+        });
+        
+        // Map Django user data to your UI state
+        setUser({
+          name: userRes.data.username, // or userRes.data.full_name if Bayazid added it
+          memberSince: new Date(userRes.data.date_joined || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          avatar: null
+        });
+
+        // 2. Fetch Orders (This assumes Bayazid has a /api/orders/ endpoint)
+        // For now, I'll keep your mock data but fetch it inside the try block
+        // const ordersRes = await axios.get('http://localhost:8000/api/orders/');
+        // setOrders(ordersRes.data);
+        
+        setOrders([
+          { id: "SOMA-9921", date: "April 02, 2026", status: "In Transit", total: "৳ 25,620", item: "Premium Dhakai Jamdani" },
+          { id: "SOMA-8812", date: "March 15, 2026", status: "Delivered", total: "৳ 1,420", item: "Traditional Roshmalai (2kg)" }
+        ]);
+
+      } catch (err) {
+        console.error("Dashboard Sync Error:", err);
+        if (err.response?.status === 401) handleSignOut();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [navigate]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   const handleOpenReview = (order) => {
     setSelectedOrder(order);
     setIsReviewModalOpen(true);
   };
 
-  const handleSubmitReview = (e) => {
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
-    // Logic for Axios POST request would go here
-    console.log(`Review submitted for ${selectedOrder.id}: ${rating} Stars`);
-    setIsReviewModalOpen(false);
-    setRating(0);
-    alert("Thank you! Your verified heritage review has been submitted.");
+    const token = localStorage.getItem('token');
+    
+    try {
+      // Logic for sending review to Bayazid's backend
+      // await axios.post('http://localhost:8000/api/reviews/', {
+      //   order_id: selectedOrder.id,
+      //   rating: rating,
+      //   comment: e.target.reviewText.value
+      // }, { headers: { Authorization: `Token ${token}` } });
+
+      alert("Thank you! Your verified heritage review has been submitted.");
+      setIsReviewModalOpen(false);
+      setRating(0);
+    } catch (err) {
+      alert("Failed to submit review. Try again later.");
+    }
   };
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-[#F9F7F2]">
+      <div className="animate-pulse serif text-[#A33B26]">Synchronizing Somagom Profile...</div>
+    </div>
+  );
 
   return (
     <div className="bg-[#F9F7F2] min-h-screen relative">
-      {/* Dashboard Header */}
+      {/* Header */}
       <div className="bg-white border-b border-stone-200 px-6 py-10 md:px-20">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 bg-stone-200 rounded-full flex items-center justify-center text-2xl serif text-stone-400 uppercase">
+            <div className="w-20 h-20 bg-[#A33B26]/10 rounded-full flex items-center justify-center text-2xl serif text-[#A33B26] uppercase">
               {user.name[0]}
             </div>
             <div>
@@ -47,33 +108,35 @@ export default function UserDashboard() {
               <p className="text-xs uppercase tracking-widest text-stone-400 mt-1">Heritage Collector since {user.memberSince}</p>
             </div>
           </div>
-          <button className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-red-700 hover:opacity-70 transition">
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-red-700 hover:opacity-70 transition"
+          >
             <LogOut size={16} /> Sign Out
           </button>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12 md:px-20 grid grid-cols-1 lg:grid-cols-4 gap-12">
-        
-        {/* Sidebar Navigation */}
+        {/* Sidebar */}
         <div className="lg:col-span-1 space-y-2">
-          <button onClick={() => setActiveTab('orders')} className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-bold uppercase tracking-widest transition ${activeTab === 'orders' ? 'brand-bg text-white' : 'bg-white text-stone-500 hover:bg-stone-50'}`}>
+          <button onClick={() => setActiveTab('orders')} className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-bold uppercase tracking-widest transition ${activeTab === 'orders' ? 'bg-[#A33B26] text-white' : 'bg-white text-stone-500 hover:bg-stone-50'}`}>
             <Package size={18} /> My Orders
           </button>
-          <button onClick={() => setActiveTab('wishlist')} className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-bold uppercase tracking-widest transition ${activeTab === 'wishlist' ? 'brand-bg text-white' : 'bg-white text-stone-500 hover:bg-stone-50'}`}>
+          <button onClick={() => setActiveTab('wishlist')} className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-bold uppercase tracking-widest transition ${activeTab === 'wishlist' ? 'bg-[#A33B26] text-white' : 'bg-white text-stone-500 hover:bg-stone-50'}`}>
             <Heart size={18} /> Wishlist
           </button>
-          <button onClick={() => setActiveTab('settings')} className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-bold uppercase tracking-widest transition ${activeTab === 'settings' ? 'brand-bg text-white' : 'bg-white text-stone-500 hover:bg-stone-50'}`}>
+          <button onClick={() => setActiveTab('settings')} className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-bold uppercase tracking-widest transition ${activeTab === 'settings' ? 'bg-[#A33B26] text-white' : 'bg-white text-stone-500 hover:bg-stone-50'}`}>
             <Settings size={18} /> Account Settings
           </button>
         </div>
 
-        {/* Main Content Area */}
+        {/* Content */}
         <div className="lg:col-span-3">
           {activeTab === 'orders' && (
             <div className="space-y-6">
               <h3 className="serif text-2xl mb-6">Recent Orders</h3>
-              {orders.map((order) => (
+              {orders.length > 0 ? orders.map((order) => (
                 <div key={order.id} className="bg-white border border-stone-200 p-6 rounded-sm shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
                     <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm mb-2 inline-block ${order.status === 'Delivered' ? 'bg-green-50 text-green-700' : 'bg-[#A33B26]/5 text-[#A33B26]'}`}>
@@ -82,7 +145,6 @@ export default function UserDashboard() {
                     <h4 className="font-bold text-lg">{order.item}</h4>
                     <p className="text-xs text-stone-400">Order ID: {order.id} | Date: {order.date}</p>
                     
-                    {/* TRIGGER RATING BUTTON */}
                     {order.status === "Delivered" && (
                       <button 
                         onClick={() => handleOpenReview(order)}
@@ -99,7 +161,11 @@ export default function UserDashboard() {
                     </button>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="bg-white p-10 text-center border border-dashed border-stone-300">
+                  <p className="text-stone-400 italic">No heritage orders found yet.</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -112,13 +178,13 @@ export default function UserDashboard() {
                   <input className="w-full p-3 border border-stone-200 focus:border-[#A33B26] outline-none bg-stone-50" defaultValue={user.name} />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold tracking-widest text-stone-400 block mb-2">Default Shipping Address</label>
+                  <label className="text-[10px] uppercase font-bold tracking-widest text-stone-400 block mb-2">Shipping Address</label>
                   <div className="flex items-start gap-3 p-4 bg-stone-50 border border-stone-200 text-sm italic">
                     <MapPin size={18} className="text-[#A33B26]" />
-                    Savar, Dhaka Division, Bangladesh (Update for faster delivery)
+                    Savar, Dhaka Division, Bangladesh
                   </div>
                 </div>
-                <button className="brand-bg text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition">
+                <button className="bg-[#A33B26] text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition">
                   Save Changes
                 </button>
               </form>
@@ -127,7 +193,7 @@ export default function UserDashboard() {
         </div>
       </div>
 
-      {/* --- PREMIUM REVIEW MODAL --- */}
+      {/* Review Modal */}
       {isReviewModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => setIsReviewModalOpen(false)} />
@@ -135,56 +201,26 @@ export default function UserDashboard() {
             <button onClick={() => setIsReviewModalOpen(false)} className="absolute top-4 right-4 text-stone-400 hover:text-stone-900">
               <X size={24} />
             </button>
-            
             <div className="text-center mb-8">
-              <span className="text-[#A33B26] text-[10px] font-bold uppercase tracking-widest">Post-Purchase Review</span>
-              <h2 className="serif text-3xl mt-2">Rate Your {selectedOrder?.item}</h2>
+              <span className="text-[#A33B26] text-[10px] font-bold uppercase tracking-widest">Verified Buyer</span>
+              <h2 className="serif text-3xl mt-2">Review Your {selectedOrder?.item}</h2>
             </div>
-
             <form onSubmit={handleSubmitReview} className="space-y-6">
-              {/* Star Rating Selection */}
               <div className="flex flex-col items-center gap-3">
-                <span className="text-[10px] uppercase font-bold text-stone-400">Your Rating</span>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      onMouseEnter={() => setHover(star)}
-                      onMouseLeave={() => setHover(0)}
-                      className="transition-transform hover:scale-125"
-                    >
-                      <Star
-                        size={32}
-                        className={star <= (hover || rating) ? "text-[#A33B26]" : "text-stone-200"}
-                        fill={star <= (hover || rating) ? "currentColor" : "none"}
-                      />
+                    <button key={star} type="button" onClick={() => setRating(star)} onMouseEnter={() => setHover(star)} onMouseLeave={() => setHover(0)}>
+                      <Star size={32} className={star <= (hover || rating) ? "text-[#A33B26]" : "text-stone-200"} fill={star <= (hover || rating) ? "currentColor" : "none"} />
                     </button>
                   ))}
                 </div>
               </div>
-
-              <div>
-                <label className="text-[10px] uppercase font-bold tracking-widest text-stone-400 block mb-2">Share your experience</label>
-                <textarea 
-                  required
-                  rows="4"
-                  placeholder="Tell us about the weave, the texture, or the taste..."
-                  className="w-full p-4 border border-stone-200 bg-stone-50 focus:border-[#A33B26] outline-none text-sm resize-none italic"
-                />
-              </div>
-
+              <textarea name="reviewText" required rows="4" placeholder="Share your experience..." className="w-full p-4 border border-stone-200 bg-stone-50 focus:border-[#A33B26] outline-none text-sm italic" />
               <div className="p-4 bg-green-50 border border-green-100 rounded flex gap-3 items-center">
                 <ShieldCheck size={20} className="text-green-700" />
-                <p className="text-[10px] text-green-800 leading-tight uppercase font-bold">
-                  As a verified buyer, your review will receive the "GI Authentic" badge on our public page.
-                </p>
+                <p className="text-[10px] text-green-800 uppercase font-bold">GI Authentic Badge Protected</p>
               </div>
-
-              <button type="submit" className="w-full brand-bg text-white py-5 text-xs font-bold uppercase tracking-widest hover:opacity-95 transition shadow-lg">
-                Submit Verified Review
-              </button>
+              <button type="submit" className="w-full bg-[#A33B26] text-white py-5 text-xs font-bold uppercase tracking-widest hover:opacity-95 transition">Submit Review</button>
             </form>
           </div>
         </div>
