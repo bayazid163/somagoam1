@@ -1,50 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import axios from 'axios';
 
-// Import images
+// Import images (Keep for fallback and Spotlight)
 import shataranji from '../assets/shataranji.png';
-import nakshiKatha from '../assets/nakshi_katha.jpg';
-import shitalPati from '../assets/shital_pati.jpg';
-import pottery from '../assets/pottery.jpg';
-import bamboo from '../assets/bamboo_craft.jpeg';
-import metal from '../assets/metal_craft.png';
-import wood from '../assets/wood_craving.jpg';
-import jute from '../assets/jute_craft.jpg';
-import jewelry from '../assets/trival_jewallary.jpg';
 import craftStory from '../assets/craft_story.jpg';
+// ... other imports ...
 
 export default function Crafts() {
   const { addToCart } = useCart();
+  
+  // Integration State
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Data array with rating and reviewCount added
-  const crafts = [
-    { name: "Jessore Shotoronji", region: "Jessore", img: shataranji, status: "GI Status", type: "Textile Craft", price: "৳ 3,500", basePrice: 3500, rating: 5, reviewCount: 42, desc: "Traditional hand-woven floor mats featuring rhythmic patterns and organic dyes." },
-    { name: "Nakshi Kantha", region: "Mymensingh", img: nakshiKatha, status: "GI Status", type: "Textile Craft", price: "৳ 3,000", basePrice: 3000, rating: 5, reviewCount: 156, desc: "Hand-embroidered quilts telling stories of rural life through every stitch." },
-    { name: "Shital Pati", region: "Sylhet", img: shitalPati, status: "GI Status", type: "Cane Craft", price: "৳ 2,500", basePrice: 2500, rating: 4, reviewCount: 88, desc: "Cool-feeling mats hand-woven from Murta cane, recognized by UNESCO." },
-    { name: "Heritage Pottery", region: "Dhamrai", img: pottery, status: "Local Heritage", type: "Clay Craft", price: "৳ 300", basePrice: 300, rating: 4, reviewCount: 215, desc: "Terracotta and glazed clay work crafted using ancient wood-fired kilns." },
-    { name: "Bamboo & Cane", region: "Sylhet", img: bamboo, status: "Local Heritage", type: "Utility Craft", price: "৳ 500", basePrice: 500, rating: 5, reviewCount: 67, desc: "Sustainable utility items, from baskets to sophisticated home decor." },
-    { name: "Brass & Bell Metal", region: "Dhamrai", img: metal, status: "Local Heritage", type: "Metal Craft", price: "৳ 2,000", basePrice: 2000, rating: 5, reviewCount: 34, desc: "Lost-wax casting method used to create royal tableware and statues." },
-    { name: "Wood Carving", region: "Dinajpur", img: wood, status: "Local Heritage", type: "Wood Craft", price: "৳ 1,500", basePrice: 1500, rating: 4, reviewCount: 29, desc: "Intricate relief carving on seasoned wood for traditional doors." },
-    { name: "Jute Handicrafts", region: "Faridpur", img: jute, status: "Local Heritage", type: "Eco Craft", price: "৳ 300", basePrice: 300, rating: 5, reviewCount: 312, desc: "Biodegradable fashion bags and home textiles from the 'Golden Fiber'." },
-    { name: "Tribal Handicrafts", region: "Hill Tracts", img: jewelry, status: "Local Heritage", type: "Ethnic Craft", price: "৳ 800", basePrice: 800, rating: 5, reviewCount: 51, desc: "Traditional jewelry reflecting the diverse ethnic groups of CHT." },
-  ];
+  useEffect(() => {
+    const fetchCrafts = async () => {
+      try {
+        // Fetching from your craft category endpoint
+        const response = await axios.get('http://localhost:8000/api/products/?category=crafts');
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching artisanal crafts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCrafts();
+  }, []);
 
   // Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentCrafts = crafts.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(crafts.length / itemsPerPage);
+  const currentCrafts = products.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-[#F9F7F2]">
+      <div className="text-[#A33B26] serif animate-pulse">Gathering hand-carved heritage...</div>
+    </div>
+  );
 
   return (
     <div className="bg-[#F9F7F2]">
@@ -60,63 +66,64 @@ export default function Crafts() {
       {/* Main Grid */}
       <main className="px-10 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {currentCrafts.map((item, index) => {
-            const productSlug = item.name.toLowerCase().replace(/\s+/g, '-');
+          {currentCrafts.length > 0 ? currentCrafts.map((item, index) => {
+            // Integration: Use ID or slugify name
+            const productId = item.id || item.name.toLowerCase().replace(/\s+/g, '-');
 
             return (
               <div key={index} className="bg-white border border-stone-100 hover:border-[#A33B26] transition-all duration-500 transform hover:-translate-y-2 flex flex-col group">
                 
                 {/* Image Section */}
-                <Link to={`/product/${productSlug}`} className="relative h-72 overflow-hidden block">
+                <Link to={`/product/${productId}`} className="relative h-72 overflow-hidden block">
                   <img 
-                    src={item.img} 
+                    src={item.image || item.img || shataranji} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                     alt={item.name} 
                   />
                   <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
-                    {item.region}
+                    {item.region || item.origin_district}
                   </div>
                 </Link>
 
                 <div className="p-8 flex-grow flex flex-col">
                   <div className="flex justify-between items-center mb-4">
-                    <span className={`text-[8px] font-extrabold px-2 py-1 rounded uppercase tracking-wider ${item.status === 'GI Status' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                      {item.status}
+                    <span className={`text-[8px] font-extrabold px-2 py-1 rounded uppercase tracking-wider ${item.status === 'GI Status' || item.is_gi ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                      {item.is_gi ? "GI Status" : (item.status || "Local Heritage")}
                     </span>
-                    <span className="brand-color font-bold italic serif text-[11px]">{item.type}</span>
+                    <span className="brand-color font-bold italic serif text-[11px]">{item.type || 'Handicraft'}</span>
                   </div>
                   
-                  <Link to={`/product/${productSlug}`}>
+                  <Link to={`/product/${productId}`}>
                     <h3 className="text-2xl serif mb-1 hover:text-[#A33B26] transition-colors">{item.name}</h3>
                   </Link>
 
-                  {/* Rating Display with Review Count */}
+                  {/* Rating Display */}
                   <div className="flex items-center gap-1 mb-4">
                     <div className="flex text-[#A33B26]">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={10} fill={i < item.rating ? "currentColor" : "none"} />
+                        <Star key={i} size={10} fill={i < (item.rating || 5) ? "currentColor" : "none"} />
                       ))}
                     </div>
                     <span className="text-[10px] text-stone-400 font-bold">
-                      ({item.rating}.0) <span className="ml-1 font-normal italic">by {item.reviewCount} collectors</span>
+                      ({item.rating || 5}.0) <span className="ml-1 font-normal italic">by {item.reviewCount || item.review_count || 0} collectors</span>
                     </span>
                   </div>
                   
-                  <p className="text-stone-500 text-xs leading-relaxed flex-grow">{item.desc}</p>
+                  <p className="text-stone-500 text-xs leading-relaxed flex-grow">{item.desc || item.description}</p>
                   
                   {/* Action Section */}
                   <div className="pt-6 border-t border-stone-100 flex justify-between items-center mt-4">
-                    <span className="text-lg font-light">{item.price}</span>
+                    <span className="text-lg font-light">৳ {item.price}</span>
                     
                     <div className="flex items-center gap-3">
                       <button 
-                        onClick={() => addToCart({ ...item, price: item.basePrice })}
+                        onClick={() => addToCart({ ...item, price: parseFloat(item.basePrice || item.price) })}
                         className="brand-bg text-white px-4 py-2 text-[10px] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity"
                       >
                         Add to Bag
                       </button>
                       <Link 
-                        to={`/product/${productSlug}`} 
+                        to={`/product/${productId}`} 
                         className="brand-color text-[10px] font-bold uppercase tracking-widest hover:underline"
                       >
                         Details
@@ -126,43 +133,47 @@ export default function Crafts() {
                 </div>
               </div>
             );
-          })}
+          }) : (
+            <div className="col-span-3 text-center py-20 text-stone-400 italic">No artisanal crafts found.</div>
+          )}
         </div>
 
         {/* Pagination Controls */}
-        <div className="mt-20 flex justify-center items-center gap-4">
-          <button 
-            onClick={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="p-3 border border-stone-200 rounded-full disabled:opacity-30 hover:bg-stone-100 transition-colors"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          
-          <div className="flex gap-3">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => paginate(i + 1)}
-                className={`w-10 h-10 text-[11px] font-bold rounded-full transition-all ${
-                  currentPage === i + 1 
-                  ? 'brand-bg text-white shadow-lg' 
-                  : 'border border-stone-200 text-stone-400 hover:border-[#A33B26]'
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
+        {totalPages > 1 && (
+          <div className="mt-20 flex justify-center items-center gap-4">
+            <button 
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-3 border border-stone-200 rounded-full disabled:opacity-30 hover:bg-stone-100 transition-colors"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            
+            <div className="flex gap-3">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => paginate(i + 1)}
+                  className={`w-10 h-10 text-[11px] font-bold rounded-full transition-all ${
+                    currentPage === i + 1 
+                    ? 'brand-bg text-white shadow-lg' 
+                    : 'border border-stone-200 text-stone-400 hover:border-[#A33B26]'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
 
-          <button 
-            onClick={() => paginate(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="p-3 border border-stone-200 rounded-full disabled:opacity-30 hover:bg-stone-100 transition-colors"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
+            <button 
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-3 border border-stone-200 rounded-full disabled:opacity-30 hover:bg-stone-100 transition-colors"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        )}
       </main>
 
       {/* Artisan Spotlight */}
