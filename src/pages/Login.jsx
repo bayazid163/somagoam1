@@ -10,19 +10,19 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // 1. State for credentials (Role removed)
+  // State for credentials
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
   });
 
-  // 2. Handle input changes
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials(prev => ({ ...prev, [name]: value }));
   };
 
-  // 3. Django Login Integration
+  // Django Login Integration
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -30,22 +30,32 @@ export default function Login() {
 
     try {
       const response = await axios.post('http://localhost:8000/dj-rest-auth/login/', {
+        // IMPORTANT: Because Bayazid set USERNAME_FIELD = 'email', 
+        // Django expects the email value inside the 'username' key.
         username: credentials.email, 
-        email: credentials.email,
         password: credentials.password
       });
 
       if (response.status === 200) {
-        // 4. Save the token
+        // Save the token (handles 'key' for TokenAuth or 'access' for JWT)
         const token = response.data.key || response.data.access;
         localStorage.setItem('token', token);
         
-        alert("Login Successful!");
+        // Optional: Save user details if returned
+        if (response.data.user) {
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
+
         navigate('/dashboard'); 
       }
     } catch (err) {
       const serverError = err.response?.data;
-      setError(serverError ? "Invalid email or password." : "Server unreachable. Check if Django is running.");
+      // Provide specific feedback if the backend sends it, otherwise default
+      if (serverError?.non_field_errors) {
+        setError(serverError.non_field_errors[0]);
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -78,7 +88,7 @@ export default function Login() {
         <form onSubmit={handleSubmit}>
           {/* Email Field */}
           <div className="relative mb-6">
-            <label className="absolute -top-[9px] left-[15px] bg-white px-2 text-[11px] font-semibold text-[#A33B26] uppercase tracking-wider">
+            <label className="absolute -top-[9px] left-[15px] bg-white px-2 text-[11px] font-semibold text-[#A33B26] uppercase tracking-wider z-10">
               Email Address
             </label>
             <span className="absolute left-[18px] top-1/2 -translate-y-1/2 text-[#A33B26]">
@@ -97,7 +107,7 @@ export default function Login() {
 
           {/* Password Field */}
           <div className="relative mb-6">
-            <label className="absolute -top-[9px] left-[15px] bg-white px-2 text-[11px] font-semibold text-[#A33B26] uppercase tracking-wider">
+            <label className="absolute -top-[9px] left-[15px] bg-white px-2 text-[11px] font-semibold text-[#A33B26] uppercase tracking-wider z-10">
               Password
             </label>
             <span className="absolute left-[18px] top-1/2 -translate-y-1/2 text-[#A33B26]">
@@ -114,7 +124,11 @@ export default function Login() {
             />
           </div>
 
-          <a href="#" className="block text-right text-[12px] text-stone-400 mb-6 hover:text-[#A33B26]">Forgot password?</a>
+          <div className="flex justify-end mb-6">
+             <button type="button" className="text-[12px] text-stone-400 hover:text-[#A33B26] transition-colors">
+               Forgot password?
+             </button>
+          </div>
 
           <button 
             type="submit" 
@@ -133,11 +147,11 @@ export default function Login() {
 
         {/* Social Login Buttons */}
         <div className="flex gap-4 mb-8">
-          <button className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors gap-2">
+          <button type="button" className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors gap-2">
             <i className="fab fa-google text-[#DB4437]"></i>
             <span className="text-[10px] font-bold uppercase tracking-widest text-stone-600">Google</span>
           </button>
-          <button className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors gap-2">
+          <button type="button" className="flex-1 h-12 border border-stone-100 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors gap-2">
             <i className="fab fa-facebook-f text-[#4267B2]"></i>
             <span className="text-[10px] font-bold uppercase tracking-widest text-stone-600">Facebook</span>
           </button>

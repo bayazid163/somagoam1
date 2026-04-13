@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Package, Heart, Settings, LogOut, MapPin, Star, X, ShieldCheck } from 'lucide-react';
+import { Package, Heart, Settings, LogOut, MapPin, Star, X, ShieldCheck, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function UserDashboard() {
@@ -12,9 +12,18 @@ export default function UserDashboard() {
   const [hover, setHover] = useState(0);
 
   // --- INTEGRATION STATE ---
-  const [user, setUser] = useState({ name: "Collector", memberSince: "...", avatar: null });
+  const [user, setUser] = useState({ 
+    displayName: "Collector", 
+    firstName: "", 
+    lastName: "", 
+    email: "",
+    address: "Savar, Dhaka Division, Bangladesh",
+    memberSince: "...", 
+    avatar: null 
+  });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,18 +39,19 @@ export default function UserDashboard() {
           headers: { Authorization: `Token ${token}` }
         });
         
-        // Map Django user data to your UI state
+        const { first_name, last_name, email, date_joined, username, address } = userRes.data;
+
         setUser({
-          name: userRes.data.username, // or userRes.data.full_name if Bayazid added it
-          memberSince: new Date(userRes.data.date_joined || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          displayName: `${first_name} ${last_name}`.trim() || username,
+          firstName: first_name || "",
+          lastName: last_name || "",
+          email: email,
+          address: address || "Savar, Dhaka Division, Bangladesh",
+          memberSince: new Date(date_joined || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
           avatar: null
         });
 
-        // 2. Fetch Orders (This assumes Bayazid has a /api/orders/ endpoint)
-        // For now, I'll keep your mock data but fetch it inside the try block
-        // const ordersRes = await axios.get('http://localhost:8000/api/orders/');
-        // setOrders(ordersRes.data);
-        
+        // 2. Fetch Orders (Mock data for now)
         setOrders([
           { id: "SOMA-9921", date: "April 02, 2026", status: "In Transit", total: "৳ 25,620", item: "Premium Dhakai Jamdani" },
           { id: "SOMA-8812", date: "March 15, 2026", status: "Delivered", total: "৳ 1,420", item: "Traditional Roshmalai (2kg)" }
@@ -63,6 +73,33 @@ export default function UserDashboard() {
     navigate('/login');
   };
 
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setIsUpdating(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await axios.patch('http://localhost:8000/dj-rest-auth/user/', {
+        first_name: user.firstName,
+        last_name: user.lastName,
+      }, {
+        headers: { Authorization: `Token ${token}` }
+      });
+
+      if (response.status === 200) {
+        setUser(prev => ({
+          ...prev,
+          displayName: `${response.data.first_name} ${response.data.last_name}`.trim() || response.data.username
+        }));
+        alert("Profile updated successfully!");
+      }
+    } catch (err) {
+      alert("Failed to update profile details.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const handleOpenReview = (order) => {
     setSelectedOrder(order);
     setIsReviewModalOpen(true);
@@ -70,22 +107,9 @@ export default function UserDashboard() {
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
-    
-    try {
-      // Logic for sending review to Bayazid's backend
-      // await axios.post('http://localhost:8000/api/reviews/', {
-      //   order_id: selectedOrder.id,
-      //   rating: rating,
-      //   comment: e.target.reviewText.value
-      // }, { headers: { Authorization: `Token ${token}` } });
-
-      alert("Thank you! Your verified heritage review has been submitted.");
-      setIsReviewModalOpen(false);
-      setRating(0);
-    } catch (err) {
-      alert("Failed to submit review. Try again later.");
-    }
+    alert("Thank you! Your verified heritage review has been submitted.");
+    setIsReviewModalOpen(false);
+    setRating(0);
   };
 
   if (loading) return (
@@ -101,10 +125,10 @@ export default function UserDashboard() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-6">
             <div className="w-20 h-20 bg-[#A33B26]/10 rounded-full flex items-center justify-center text-2xl serif text-[#A33B26] uppercase">
-              {user.name[0]}
+              {user.displayName[0]}
             </div>
             <div>
-              <h1 className="text-3xl serif">Welcome back, {user.name}</h1>
+              <h1 className="text-3xl serif">Welcome back, {user.displayName}</h1>
               <p className="text-xs uppercase tracking-widest text-stone-400 mt-1">Heritage Collector since {user.memberSince}</p>
             </div>
           </div>
@@ -172,20 +196,42 @@ export default function UserDashboard() {
           {activeTab === 'settings' && (
             <div className="bg-white border border-stone-200 p-8">
               <h3 className="serif text-2xl mb-8">Account Details</h3>
-              <form className="space-y-6 max-w-md">
+              <form className="space-y-6 max-w-md" onSubmit={handleUpdateProfile}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] uppercase font-bold tracking-widest text-stone-400 block mb-2">First Name</label>
+                    <input 
+                      className="w-full p-3 border border-stone-200 focus:border-[#A33B26] outline-none bg-stone-50" 
+                      value={user.firstName}
+                      onChange={(e) => setUser({...user, firstName: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase font-bold tracking-widest text-stone-400 block mb-2">Last Name</label>
+                    <input 
+                      className="w-full p-3 border border-stone-200 focus:border-[#A33B26] outline-none bg-stone-50" 
+                      value={user.lastName}
+                      onChange={(e) => setUser({...user, lastName: e.target.value})}
+                    />
+                  </div>
+                </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold tracking-widest text-stone-400 block mb-2">Display Name</label>
-                  <input className="w-full p-3 border border-stone-200 focus:border-[#A33B26] outline-none bg-stone-50" defaultValue={user.name} />
+                  <label className="text-[10px] uppercase font-bold tracking-widest text-stone-400 block mb-2">Email Address</label>
+                  <input className="w-full p-3 border border-stone-200 bg-stone-100 text-stone-500 outline-none cursor-not-allowed" value={user.email} readOnly />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold tracking-widest text-stone-400 block mb-2">Shipping Address</label>
                   <div className="flex items-start gap-3 p-4 bg-stone-50 border border-stone-200 text-sm italic">
                     <MapPin size={18} className="text-[#A33B26]" />
-                    Savar, Dhaka Division, Bangladesh
+                    {user.address}
                   </div>
                 </div>
-                <button className="bg-[#A33B26] text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition">
-                  Save Changes
+                <button 
+                  type="submit" 
+                  disabled={isUpdating}
+                  className="bg-[#A33B26] text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition disabled:opacity-50"
+                >
+                  {isUpdating ? "Saving..." : "Save Changes"}
                 </button>
               </form>
             </div>
