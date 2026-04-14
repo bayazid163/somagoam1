@@ -6,18 +6,28 @@ import axios from 'axios';
 
 // Keep your imports
 import roshmalai from '../assets/cumilla_roshmalai.png';
-// ... rest of your imports ...
+import NoProducts from '../components/NoProducts';
 
 export default function Food() {
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDistrict, setSelectedDistrict] = useState(''); // New Filter State
+
+  // Available Districts for Somagom Food
+  const districts = ["All Regions", "Cumilla", "Natore", "Bogura", "Rajshahi", "Sylhet", "Barishal"];
 
   useEffect(() => {
     const fetchFood = async () => {
+      setLoading(true);
       try {
-        // Replace with Bayazid's actual food endpoint
-        const response = await axios.get('http://localhost:8000/api/products/?category=food');
+        // Build the URL with the origin_district parameter if selected
+        let url = 'http://localhost:8000/api/products/?category=food';
+        if (selectedDistrict && selectedDistrict !== "All Regions") {
+          url += `&origin_district=${selectedDistrict.toLowerCase()}`;
+        }
+
+        const response = await axios.get(url);
         setProducts(response.data);
       } catch (error) {
         console.error("Error loading heritage food:", error);
@@ -26,7 +36,7 @@ export default function Food() {
       }
     };
     fetchFood();
-  }, []);
+  }, [selectedDistrict]); // Re-run effect when district changes
 
   // API INTEGRATION: Mapping real data into your UI sections
   const sections = [
@@ -56,7 +66,6 @@ export default function Food() {
     } 
   ];
 
-  // Helper to safely handle images (Use API image if available, fallback to your imports)
   const getProductImage = (item) => item.image || item.img || roshmalai;
 
   const PaginatedFoodGrid = ({ sectionItems }) => {
@@ -72,10 +81,9 @@ export default function Food() {
       <>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {currentItems.map((item, iIdx) => {
-            // Use ID if available, else slugify name
             const productId = item.id || item.name.toLowerCase().replace(/\s+/g, '-');
             return (
-              <div key={iIdx} className="food-card bg-white border border-stone-100 hover:border-[#A33B26] transition-all duration-300 group flex flex-col">
+              <div key={iIdx} className="food-card bg-white border border-stone-100 hover:border-[#A33B26] transition-all duration-300 group flex flex-col shadow-sm">
                 <Link to={`/product/${productId}`} className="relative h-60 overflow-hidden block">
                   <img src={getProductImage(item)} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={item.name} />
                   <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest uppercase">{item.region || item.origin_district}</div>
@@ -83,8 +91,10 @@ export default function Food() {
 
                 <div className="p-6 flex flex-col flex-grow">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="bg-green-50 text-green-700 text-[9px] font-extrabold px-2 py-1 rounded">{item.badge || (item.is_gi ? "GI CERTIFIED" : "AUTHENTIC")}</span>
-                    <span className="brand-color font-bold italic serif text-[10px]">GI Status</span>
+                    <span className="bg-green-50 text-green-700 text-[9px] font-extrabold px-2 py-1 rounded">
+                      {item.is_gi ? "GI CERTIFIED" : (item.badge || "AUTHENTIC")}
+                    </span>
+                    <span className="brand-color font-bold italic serif text-[10px]">Heritage Food</span>
                   </div>
 
                   <Link to={`/product/${productId}`}>
@@ -98,14 +108,14 @@ export default function Food() {
                       ))}
                     </div>
                     <span className="text-[10px] text-stone-400 font-bold">
-                      ({item.rating || 5}.0) <span className="ml-1 font-normal italic">from {item.review_count || item.reviewCount || 0} patrons</span>
+                      ({item.rating || 5}.0) <span className="ml-1 font-normal italic">from {item.review_count || 0} patrons</span>
                     </span>
                   </div>
 
-                  <p className="text-stone-500 text-xs flex-grow mb-4">{item.description || item.desc}</p>
+                  <p className="text-stone-500 text-xs flex-grow mb-4 line-clamp-2">{item.description || item.desc}</p>
                   
                   <div className="pt-4 mt-auto border-t border-stone-100 flex justify-between items-center">
-                    <span className="font-bold font-sans text-sm">৳ {item.price}{item.unit || '/ kg'}</span>
+                    <span className="font-bold font-sans text-sm text-stone-900">৳ {item.price}{item.unit || '/ kg'}</span>
                     <div className="flex items-center gap-3">
                       <button 
                         onClick={() => addToCart({ ...item, price: parseFloat(item.price) })}
@@ -113,9 +123,6 @@ export default function Food() {
                       >
                         Order
                       </button>
-                      <Link to={`/product/${productId}`} className="brand-color text-[9px] font-bold uppercase tracking-widest hover:underline">
-                        Details
-                      </Link>
                     </div>
                   </div>
                 </div>
@@ -129,7 +136,7 @@ export default function Food() {
             <button 
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-1 border border-stone-200 rounded-full disabled:opacity-20 hover:bg-stone-50"
+              className="p-1 border border-stone-200 rounded-full disabled:opacity-20 hover:bg-stone-50 transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
@@ -139,7 +146,7 @@ export default function Food() {
             <button 
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-1 border border-stone-200 rounded-full disabled:opacity-20 hover:bg-stone-50"
+              className="p-1 border border-stone-200 rounded-full disabled:opacity-20 hover:bg-stone-50 transition-colors"
             >
               <ChevronRight size={16} />
             </button>
@@ -156,8 +163,8 @@ export default function Food() {
   );
 
   return (
-    <div className="bg-[#F9F7F2]">
-      {/* Header, Sections mapping, and Safety Section remain exactly the same */}
+    <div className="bg-[#F9F7F2] min-h-screen">
+      {/* Header */}
       <header className="px-10 py-20 text-center">
         <span className="brand-color text-xs uppercase tracking-[0.4em] mb-4 block font-bold">The Taste of Tradition</span>
         <h1 className="text-5xl md:text-7xl serif mb-6">GI <span className="italic font-light">Food</span></h1>
@@ -166,30 +173,60 @@ export default function Food() {
         </p>
       </header>
 
-      {sections.map((section, sIdx) => (
-        section.items.length > 0 && (
-          <main key={sIdx} className="px-10 py-6">
-            <div className="cat-header border-l-4 border-[#A33B26] pl-6 mb-8 mt-12">
-              <h2 className="text-3xl serif">{section.title} <span className="text-sm font-sans font-light text-stone-400 ml-2">{section.subtitle}</span></h2>
-              <p className={`text-xs uppercase tracking-widest font-semibold ${section.title === 'Ultra-Perishable' ? 'text-red-600' : 'text-stone-500'}`}>
-                {section.warning}
-              </p>
-            </div>
-            <PaginatedFoodGrid sectionItems={section.items} />
-          </main>
-        )
-      ))}
+      {/* DISTRICT FILTER AREA */}
+      <div className="px-10 mb-8 flex flex-col md:flex-row items-center gap-6 border-b border-stone-200/50 pb-10">
+        <div className="flex flex-wrap items-center justify-center gap-4 w-full">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Regional Varieties:</span>
+          <div className="flex flex-wrap justify-center gap-2">
+            {districts.map((dist) => (
+              <button
+                key={dist}
+                onClick={() => setSelectedDistrict(dist === "All Regions" ? "" : dist)}
+                className={`px-5 py-2 text-[10px] font-bold uppercase tracking-widest transition-all border ${
+                  (selectedDistrict === dist || (dist === "All Regions" && !selectedDistrict))
+                    ? 'bg-[#A33B26] text-white border-[#A33B26] shadow-sm'
+                    : 'bg-white text-stone-500 border-stone-200 hover:border-[#A33B26]'
+                }`}
+              >
+                {dist}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
-      {/* Safety Section same as your provided code */}
-      <section className="mx-10 my-20 bg-stone-200/30 p-12 border border-stone-200 text-center">
+      {/* Main Content Area */}
+      {products.length > 0 ? (
+        <>
+          {sections.map((section, sIdx) => (
+            section.items.length > 0 && (
+              <main key={sIdx} className="px-10 py-6">
+                <div className="cat-header border-l-4 border-[#A33B26] pl-6 mb-8 mt-12">
+                  <h2 className="text-3xl serif">{section.title} <span className="text-sm font-sans font-light text-stone-400 ml-2">{section.subtitle}</span></h2>
+                  <p className={`text-xs uppercase tracking-widest font-semibold ${section.title === 'Ultra-Perishable' ? 'text-red-600' : 'text-stone-500'}`}>
+                    {section.warning}
+                  </p>
+                </div>
+                <PaginatedFoodGrid sectionItems={section.items} />
+              </main>
+            )
+          ))}
+        </>
+      ) : (
+        /* INTEGRATED EMPTY STATE */
+        <NoProducts category={selectedDistrict ? `${selectedDistrict} Delicacies` : "GI Food Delicacies"} />
+      )}
+
+      {/* Safety Section */}
+      <section className="mx-6 md:mx-10 my-20 bg-white p-12 border border-stone-200 text-center rounded-sm shadow-sm">
         <h2 className="text-3xl serif mb-6">Your Safety is Our <span className="brand-color">Heritage</span></h2>
-        <p className="text-stone-600 text-sm leading-loose max-w-2xl mx-auto mb-8">
-          We eliminate fake products by connecting you directly to the original sweetsmiths (Moyras) and artisans.
+        <p className="text-stone-600 text-sm leading-loose max-w-2xl mx-auto mb-8 italic">
+          We eliminate fake products by connecting you directly to the original sweetsmiths (Moyras) and artisans. Every box is tracked from source to doorstep.
         </p>
         <div className="flex flex-wrap justify-center gap-10">
           {['🔬 Lab Verified', '📦 Vacuum Sealed', '🌍 Global Express'].map((trait, tIdx) => (
             <div key={tIdx} className="flex items-center space-x-3">
-              <span className="text-[10px] font-bold uppercase tracking-widest">{trait}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-stone-900 border-b border-[#A33B26] pb-1">{trait}</span>
             </div>
           ))}
         </div>

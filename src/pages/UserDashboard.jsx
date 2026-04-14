@@ -51,11 +51,19 @@ export default function UserDashboard() {
           avatar: null
         });
 
-        // 2. Fetch Orders (Mock data for now)
-        setOrders([
-          { id: "SOMA-9921", date: "April 02, 2026", status: "In Transit", total: "৳ 25,620", item: "Premium Dhakai Jamdani" },
-          { id: "SOMA-8812", date: "March 15, 2026", status: "Delivered", total: "৳ 1,420", item: "Traditional Roshmalai (2kg)" }
-        ]);
+        // 2. Integration: Fetching real order history from your orders endpoint
+        try {
+          const ordersRes = await axios.get('http://localhost:8000/api/orders/my-orders/', {
+            headers: { Authorization: `Token ${token}` }
+          });
+          setOrders(ordersRes.data);
+        } catch (orderErr) {
+          // Fallback if the orders endpoint isn't fully ready yet
+          setOrders([
+            { id: "SOMA-9921", date: "April 02, 2026", status: "In Transit", total: "৳ 25,620", item: "Premium Dhakai Jamdani" },
+            { id: "SOMA-8812", date: "March 15, 2026", status: "Delivered", total: "৳ 1,420", item: "Traditional Roshmalai (2kg)" }
+          ]);
+        }
 
       } catch (err) {
         console.error("Dashboard Sync Error:", err);
@@ -107,9 +115,25 @@ export default function UserDashboard() {
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    alert("Thank you! Your verified heritage review has been submitted.");
-    setIsReviewModalOpen(false);
-    setRating(0);
+    const token = localStorage.getItem('token');
+    const reviewText = e.target.reviewText.value;
+
+    try {
+      // Integration: Posting the verified review to the backend
+      await axios.post('http://localhost:8000/api/reviews/', {
+        order_id: selectedOrder.id,
+        rating: rating,
+        comment: reviewText
+      }, {
+        headers: { Authorization: `Token ${token}` }
+      });
+      
+      alert("Thank you! Your verified heritage review has been submitted.");
+      setIsReviewModalOpen(false);
+      setRating(0);
+    } catch (err) {
+      alert("Submission failed. Please try again.");
+    }
   };
 
   if (loading) return (
@@ -256,7 +280,7 @@ export default function UserDashboard() {
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button key={star} type="button" onClick={() => setRating(star)} onMouseEnter={() => setHover(star)} onMouseLeave={() => setHover(0)}>
-                      <Star size={32} className={star <= (hover || rating) ? "text-[#A33B26]" : "text-stone-200"} fill={star <= (hover || rating) ? "currentColor" : "none"} />
+                      <Star size={32} className={star <= (hover || rating) ? "text-[#A33B26]" : "text-stone-200"} fill={star <= (hover || rating) ? "currentColor" : "none"} starId={star} />
                     </button>
                   ))}
                 </div>

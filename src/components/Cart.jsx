@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ShoppingBag, Trash2 } from 'lucide-react';
+import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
+import { useCart } from '../context/CartContext'; // Integration with context
 
-export default function Cart({ isOpen, onClose, cartItems = [] }) {
+export default function Cart({ isOpen, onClose }) {
   const navigate = useNavigate();
-
-  const total = cartItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  
+  // Integration: Pulling state and functions from your context
+  const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
 
   if (!isOpen) return null;
 
@@ -35,15 +37,29 @@ export default function Cart({ isOpen, onClose, cartItems = [] }) {
           ) : (
             cartItems.map((item) => (
               <div key={item.id} className="flex gap-4 border-b border-stone-100 pb-4">
-                <div className="w-20 h-20 bg-stone-200 flex-shrink-0" />
+                {/* Integration: Using real product image */}
+                <div className="w-20 h-20 bg-stone-200 flex-shrink-0 overflow-hidden rounded-sm">
+                   <img src={item.image || item.img} alt={item.name} className="w-full h-full object-cover" />
+                </div>
+                
                 <div className="flex-grow">
-                  <h4 className="font-bold text-sm text-stone-800">{item.name}</h4>
-                  <p className="text-[10px] text-stone-500 uppercase">{item.region}</p>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-sm font-medium">৳ {item.price.toLocaleString()}</span>
-                    <button className="text-stone-400 hover:text-red-600">
+                  <div className="flex justify-between">
+                    <h4 className="font-bold text-sm text-stone-800">{item.name}</h4>
+                    {/* Integration: Function to remove item */}
+                    <button onClick={() => removeFromCart(item.id)} className="text-stone-400 hover:text-red-600">
                       <Trash2 className="w-4 h-4" />
                     </button>
+                  </div>
+                  <p className="text-[10px] text-stone-500 uppercase">{item.region || item.origin_district}</p>
+                  
+                  <div className="flex justify-between items-center mt-2">
+                    {/* Integration: Quantity controls */}
+                    <div className="flex items-center border border-stone-200 bg-white">
+                      <button onClick={() => updateQuantity(item.id, item.qty - 1)} className="px-2 py-1 text-xs hover:text-[#A33B26]">-</button>
+                      <span className="px-2 text-xs font-bold">{item.qty}</span>
+                      <button onClick={() => updateQuantity(item.id, item.qty + 1)} className="px-2 py-1 text-xs hover:text-[#A33B26]">+</button>
+                    </div>
+                    <span className="text-sm font-medium">৳ {(item.price * item.qty).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -56,7 +72,8 @@ export default function Cart({ isOpen, onClose, cartItems = [] }) {
           <div className="p-6 bg-white border-t border-stone-200 space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-stone-500 text-sm italic">Subtotal</span>
-              <span className="text-xl font-bold brand-color">৳ {total.toLocaleString()}</span>
+              {/* Integration: Using dynamic total from context */}
+              <span className="text-xl font-bold brand-color">৳ {cartTotal.toLocaleString()}</span>
             </div>
             <button 
               onClick={() => { onClose(); navigate('/checkout'); }}

@@ -28,13 +28,16 @@ export default function ProductDetail() {
     fetchProductDetails();
   }, [id]);
 
-  // Handle Add to Bag
+  // Integration: Updated Handle Add to Bag to pass complete heritage data
   const handleAddToCart = () => {
     if (product) {
       addToCart({
-        ...product,
-        quantity: quantity,
-        price: parseFloat(product.price)
+        id: product.id, // Ensure we use the DB ID for context tracking
+        name: product.name,
+        price: parseFloat(product.price),
+        image: product.image,
+        region: product.origin_district || product.region,
+        quantity: quantity // Context will handle the increment
       });
     }
   };
@@ -162,14 +165,12 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Reviews Section - Kept Exactly as requested, can be integrated with a separate review API later */}
       <hr className="border-stone-200 mx-6 md:mx-10" />
       <div className="py-16 px-6 md:px-10">
         <div className="max-w-5xl mx-auto text-center mb-16">
           <h2 className="text-4xl md:text-5xl serif mb-4 text-stone-900">Heritage Voices</h2>
           <p className="text-[#A33B26] uppercase tracking-[0.2em] text-[10px] font-bold">Authentic Experiences</p>
         </div>
-        {/* ... (Rest of your Review UI from previous code) ... */}
       </div>
     </div>
   );

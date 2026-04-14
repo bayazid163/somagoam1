@@ -1,30 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, MessageSquare, ShieldCheck, Camera, User } from 'lucide-react';
+import axios from 'axios';
 
 export default function Reviews() {
-  // Using useState to hold our heritage review data
-  const [reviews] = useState([
-    {
-      id: 1,
-      user: "Anika T.",
-      product: "Premium Dhakai Jamdani",
-      rating: 5,
-      date: "March 20, 2026",
-      comment: "The weave is incredibly fine. You can really tell the difference with a GI-certified product. The packaging was also very elegant.",
-      location: "Dhaka",
-      verified: true
-    },
-    {
-      id: 2,
-      user: "Rahat M.",
-      product: "Traditional Roshmalai",
-      rating: 4,
-      date: "April 02, 2026",
-      comment: "Delivered chilled and fresh to my door in Sylhet. Tastes just like the ones I used to have in Cumilla during my childhood.",
-      location: "Sylhet",
-      verified: true
-    }
-  ]);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Integration: Fetching Heritage Voices from the backend
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        // Replace with your actual endpoint (e.g., Bayazid's review API)
+        const response = await axios.get('http://localhost:8000/api/reviews/');
+        setReviews(response.data);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        // Fallback to initial mock data if API is down
+        setReviews([
+          {
+            id: 1,
+            user: "Anika T.",
+            product: "Premium Dhakai Jamdani",
+            rating: 5,
+            date: "March 20, 2026",
+            comment: "The weave is incredibly fine. You can really tell the difference with a GI-certified product. The packaging was also very elegant.",
+            location: "Dhaka",
+            verified: true
+          },
+          {
+            id: 2,
+            user: "Rahat M.",
+            product: "Traditional Roshmalai",
+            rating: 4,
+            date: "April 02, 2026",
+            comment: "Delivered chilled and fresh to my door in Sylhet. Tastes just like the ones I used to have in Cumilla during my childhood.",
+            location: "Sylhet",
+            verified: true
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReviews();
+  }, []);
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-[#F9F7F2]">
+      <div className="text-[#A33B26] serif animate-pulse uppercase tracking-widest text-xs">
+        Loading Heritage Voices...
+      </div>
+    </div>
+  );
 
   return (
     <div className="bg-[#F9F7F2] min-h-screen py-16 px-6 md:px-20">
@@ -51,8 +78,9 @@ export default function Reviews() {
               <span className="font-bold text-lg text-stone-800">4.9 / 5.0</span>
             </div>
             <p className="text-sm text-stone-500 leading-relaxed mb-8">
-              Based on 1,240 verified purchases. Every review is checked against our GI-Traceability protocol to ensure Somagom authenticity.
+              Based on {reviews.length > 2 ? '1,240' : 'verified'} purchases. Every review is checked against our GI-Traceability protocol to ensure Somagom authenticity.
             </p>
+            {/* Integration: This could link to a modal or a new route /reviews/new */}
             <button className="w-full brand-bg text-white py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition flex items-center justify-center gap-2">
               <MessageSquare size={16} /> Share Your Story
             </button>
@@ -62,11 +90,12 @@ export default function Reviews() {
         {/* Right Column: Review Feed */}
         <div className="lg:col-span-2 space-y-8">
           {reviews.map((rev) => (
-            <div key={rev.id} className="bg-white border border-stone-200 p-8 rounded-sm shadow-sm">
+            <div key={rev.id} className="bg-white border border-stone-200 p-8 rounded-sm shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center text-stone-400">
-                    <User size={24} />
+                    {/* Integration: Use user profile image if available from API */}
+                    {rev.user_image ? <img src={rev.user_image} className="rounded-full object-cover w-full h-full" alt={rev.user} /> : <User size={24} />}
                   </div>
                   <div>
                     <div className="flex text-[#A33B26] mb-1">
@@ -76,7 +105,7 @@ export default function Reviews() {
                     </div>
                     <h4 className="font-bold text-stone-900">{rev.user}</h4>
                     <p className="text-[10px] text-stone-400 uppercase tracking-widest">
-                      {rev.location} • {rev.date}
+                      {rev.location} • {new Date(rev.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                     </p>
                   </div>
                 </div>
@@ -98,12 +127,13 @@ export default function Reviews() {
               </p>
               
               <div className="mt-6 flex gap-4">
-                 <div className="w-16 h-16 bg-stone-50 rounded-sm flex items-center justify-center border border-dashed border-stone-200">
-                    <Camera size={18} className="text-stone-300" />
+                 <div className="w-16 h-16 bg-stone-50 rounded-sm flex items-center justify-center border border-dashed border-stone-200 overflow-hidden">
+                    {/* Integration: Show real user-uploaded product photos */}
+                    {rev.image ? <img src={rev.image} className="object-cover w-full h-full" alt="Review" /> : <Camera size={18} className="text-stone-300" />}
                  </div>
                  <div className="flex-grow flex items-center">
                     <p className="text-[10px] text-stone-400 font-medium italic">
-                      User-uploaded image verified by Somagom IT Crew
+                      {rev.image ? "Product photo verified by Somagom IT Crew" : "No photo uploaded for this review"}
                     </p>
                  </div>
               </div>

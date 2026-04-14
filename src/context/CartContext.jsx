@@ -9,28 +9,65 @@ export const CartProvider = ({ children }) => {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  // Integration: Automatically calculate the total price of the collection
+  const [cartTotal, setCartTotal] = useState(0);
+
   useEffect(() => {
     localStorage.setItem('somagom_cart', JSON.stringify(cartItems));
+    
+    // Integration: Logic to keep the subtotal updated for the Cart sidebar
+    const newTotal = cartItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    setCartTotal(newTotal);
   }, [cartItems]);
 
   const addToCart = (product) => {
     setCartItems((prev) => {
-      const exists = prev.find((item) => item.name === product.name);
+      // Integration: Check by ID if available, otherwise fallback to Name
+      const productId = product.id || product.name;
+      const exists = prev.find((item) => (item.id || item.name) === productId);
+      
       if (exists) {
         return prev.map((item) =>
-          item.name === product.name ? { ...item, qty: item.qty + 1 } : item
+          (item.id || item.name) === productId ? { ...item, qty: item.qty + (product.quantity || 1) } : item
         );
       }
-      return [...prev, { ...product, qty: 1 }];
+      return [...prev, { ...product, qty: product.quantity || 1 }];
     });
   };
 
-  const removeFromCart = (name) => {
-    setCartItems((prev) => prev.filter((item) => item.name !== name));
+  // Integration: Updated to handle both Name and ID-based removal
+  const removeFromCart = (idOrName) => {
+    setCartItems((prev) => prev.filter((item) => (item.id || item.name) !== idOrName));
+  };
+
+  // Integration: New function to handle plus/minus buttons in the Cart.jsx
+  const updateQuantity = (idOrName, newQty) => {
+    if (newQty < 1) {
+      removeFromCart(idOrName);
+      return;
+    }
+    setCartItems((prev) =>
+      prev.map((item) =>
+        (item.id || item.name) === idOrName ? { ...item, qty: newQty } : item
+      )
+    );
+  };
+
+  // Integration: Clear cart after successful payment
+  const clearCart = () => {
+    setCartItems([]);
+    localStorage.removeItem('somagom_cart');
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ 
+      cartItems, 
+      addToCart, 
+      removeFromCart, 
+      updateQuantity, 
+      cartTotal,
+      clearCart 
+    }}>
       {children}
     </CartContext.Provider>
   );
