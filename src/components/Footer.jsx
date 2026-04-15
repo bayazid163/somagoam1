@@ -16,7 +16,7 @@ export default function Footer() {
           <ul className="text-xs space-y-4 text-stone-400 uppercase tracking-widest">
             <li><a href="/food" className="hover:text-white transition">Heritage Food</a></li>
             <li><a href="/fashion" className="hover:text-white transition">Fashion Hub</a></li>
-            <li><a href="/craft" className="hover:text-white transition">GI Crafts</a></li>
+            <li><a href="/crafts" className="hover:text-white transition">GI Crafts</a></li>
           </ul>
         </div>
 

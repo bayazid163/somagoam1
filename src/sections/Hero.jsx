@@ -1,4 +1,6 @@
 // 1. Import the background image
+import React from 'react';
+import { Link } from 'react-router-dom';
 import heroBg from '../assets/artistic_hand.jpg';
 
 export default function Hero() {
@@ -13,7 +15,7 @@ export default function Hero() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '85vh' // Matches your original CSS
+        height: '85vh'
       }}
     >
       <div className="max-w-4xl text-center">
@@ -28,12 +30,21 @@ export default function Hero() {
         </p>
         
         <div className="flex flex-col md:flex-row justify-center items-center gap-6">
-          <button className="brand-bg text-white px-10 py-4 text-xs uppercase font-bold tracking-widest hover:opacity-90 transition">
+          {/* Changed to /products to show the full heritage range */}
+          <Link 
+            to="/products" 
+            className="brand-bg text-white px-10 py-4 text-xs uppercase font-bold tracking-widest hover:opacity-90 transition inline-block text-center"
+          >
             Explore Collection
-          </button>
-          <button className="bg-white/10 backdrop-blur-md border border-white/30 text-white px-10 py-4 text-xs uppercase font-bold tracking-widest hover:bg-white hover:text-black transition">
+          </Link>
+          
+          {/* Directed to the legacy/about section */}
+          <Link 
+            to="/about" 
+            className="bg-white/10 backdrop-blur-md border border-white/30 text-white px-10 py-4 text-xs uppercase font-bold tracking-widest hover:bg-white hover:text-black transition inline-block text-center"
+          >
             Our Legacy
-          </button>
+          </Link>
         </div>
       </div>
     </section>
